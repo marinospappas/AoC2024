@@ -18,6 +18,5 @@ def aoc2024(args: String*): Unit =
     println(s"\nSolving AoC 2015 day $day")
     val solution1 = solver.part1
     val solution2 = solver.part2
-    Thread.sleep(200)
     println(s"  Part 1: ${solution1(0)}   in ${solution1(1)} msecs")
     println(s"  Part 2: ${solution2(0)}   in ${solution2(1)} msecs")
