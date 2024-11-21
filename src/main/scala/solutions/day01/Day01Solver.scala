@@ -3,7 +3,7 @@ package solutions.day01
 
 import framework.{InputReader, PuzzleSolver}
 
-class ElevatorButtons(var testData: List[String] = List()) extends PuzzleSolver {
+class Day01Solver(var testData: List[String] = List()) extends PuzzleSolver {
 
     private val inputMapper = Map('(' -> 1, ')' -> -1)
     private val inputData: List[Int] = (if (testData.nonEmpty) testData else InputReader.read(1)).transform

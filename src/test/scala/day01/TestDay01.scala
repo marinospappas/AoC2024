@@ -1,7 +1,7 @@
 package org.mpdev.scala.aoc2024
 package day01
 
-import solutions.day01.ElevatorButtons
+import solutions.day01.Day01Solver
 
 import framework.AocMain
 import org.scalatest.prop.TableDrivenPropertyChecks.*
@@ -28,7 +28,7 @@ class TestDay01 extends AnyFlatSpec {
 
     it should "solve part1 correctly" in {
         forAll (part1Params) { (input: List[String], expected: Int) =>
-            val solver = ElevatorButtons(input)
+            val solver = Day01Solver(input)
             solver.solvePart1 shouldBe expected
         }
     }
@@ -43,7 +43,7 @@ class TestDay01 extends AnyFlatSpec {
 
     it should "solve part2 correctly" in {
         forAll(part2Params) { (input: List[String], expected: Int) =>
-            val solver = ElevatorButtons(input)
+            val solver = Day01Solver(input)
             solver.solvePart2 shouldBe expected
         }
     }
