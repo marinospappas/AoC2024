@@ -13,7 +13,7 @@ object InputReader {
     def read(day: Int, pattern: String = filePattern, extension: String = "txt"): List[String] = {
         if (AocMain.environment == "none")
             return List()
-        val name = pattern + f"$day%02d" + s".$extension"
+        val name =  f"$pattern$day%02d.$extension"
         val source = fromFile(name)
         try
             source.getLines().toList

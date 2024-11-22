@@ -3,7 +3,7 @@ package solutions.day02
 
 import framework.{InputReader, PuzzleSolver}
 
-class PresentWrapping extends PuzzleSolver {
+class Day02Solver extends PuzzleSolver {
 
     private val inputData: List[Parcel] = InputReader.read(2).transform
 
