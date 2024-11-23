@@ -5,7 +5,7 @@ import framework.{InputReader, PuzzleSolver}
 
 class Day02Solver extends PuzzleSolver {
 
-    private val inputData: List[Parcel] = InputReader.read(2).transform
+    val inputData: List[Parcel] = InputReader.read(2).map( s => parcel"$s" )  //InputReader.read(2).transform
 
     override def solvePart1: Any =
         inputData.map(p => p.area() + p.extra()).sum
@@ -13,9 +13,9 @@ class Day02Solver extends PuzzleSolver {
     override def solvePart2: Any =
         inputData.map(_.ribbon()).sum
 
-    extension (l: List[String])
-        private def transform: List[Parcel] = l.map[Parcel](line => {
-            val d = line.split('x').map[Int](s => s.toInt)
+    extension (sc: StringContext)
+        private def parcel(args: String*): Parcel = {
+            val d = sc.s(args*).split("x", 3).map { _.toIntOption.getOrElse(0) }
             Parcel(d(0), d(1), d(2))
-        })
+        }
 }
