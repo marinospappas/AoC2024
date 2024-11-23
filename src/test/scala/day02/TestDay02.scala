@@ -18,10 +18,10 @@ class TestDay02 extends AnyFlatSpec {
     }
     
     it should "solve part1 correctly" in {
-        solver.solvePart1 shouldBe 101
+        solver.part1 shouldBe 101
     }
 
     it should "solve part2 correctly" in {
-        solver.solvePart2 shouldBe 48
+        solver.part2 shouldBe 48
     }
 }
