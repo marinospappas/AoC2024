@@ -1,7 +1,7 @@
 package org.mpdev.scala.aoc2024
 package framework
 
-class AoCException(msg: String) extends Exception(msg) {
+class AoCException(msg: String) extends RuntimeException(msg) {
   def this(msg: String, cause: Throwable) = {
     this(msg)
     initCause(cause)

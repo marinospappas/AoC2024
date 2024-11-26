@@ -1,16 +1,14 @@
 package org.mpdev.scala.aoc2024
 package framework
 
-import AocMain.time
-
-private def usage(): Unit = {
-    System.err.println("usage: AoCMain #day")
-    System.exit(1)
-}
+import AocMain.{time, usage}
 
 object AocMain {
     var environment = "prod"
-
+    def usage(): Unit = {
+        System.err.println("usage: AoCMain #day")
+        System.exit(1)
+    }
     def time(block: => Any): (Any, Long) = {
         val start = System.currentTimeMillis()
         (block, System.currentTimeMillis() - start)
@@ -21,7 +19,7 @@ object AocMain {
 def aoc2024(args: String*): Unit = {
     if (args.isEmpty)
         usage()
-    val day = args(0).toInt
+    val day = args(0).toIntOption.getOrElse(throw AoCException(s"bad argument for day: ${args(0)}"))
     if (!solvers.contains(day))
         throw AoCException(s"Solver for Day $day Not Configured")
     val solver = solvers(day)
