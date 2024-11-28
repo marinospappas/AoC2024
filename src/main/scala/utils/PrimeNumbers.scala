@@ -1,11 +1,12 @@
 package org.mpdev.scala.aoc2024
 package utils
 
+import scala.collection.immutable.Set
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.boundary
 import scala.util.boundary.break
-import scala.math.pow
+import scala.math.{pow, sqrt, ceil}
 
 object PrimeNumbers {
 
@@ -42,7 +43,20 @@ object PrimeNumbers {
         pFactors.toMap
     }
 
-    def divisors(number: Int): List[Int] = {
+    def divisors(number: Int): Set[Int] = {
+        val upperLimit = ceil(sqrt(number.toDouble)).toInt
+        val result = mutable.Set[Int]()
+        for (d <- 1 to upperLimit) do {
+            if (number % d == 0) {
+                result.add(d)
+                if (number / d != d)
+                    result.add(number / d)
+            }
+        }
+        result.toSet
+    }
+
+    /*def divisors(number: Int): List[Int] = {
         val primeFact = primeFactors(number)
         val result = ArrayBuffer[Int]()
         primeFact.foreach( (pf, exp) =>
@@ -60,7 +74,7 @@ object PrimeNumbers {
             result.addAll(combineWithPrevious)
         )
         (result += 1).toList
-    }
+    }*/
 
     def sigma(n: Int): Int = {
         var s = 1
