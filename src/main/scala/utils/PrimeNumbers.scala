@@ -43,7 +43,7 @@ object PrimeNumbers {
         pFactors.toMap
     }
 
-    def divisors(number: Int): Set[Int] = {
+    def divisors2(number: Int): Set[Int] = {
         val upperLimit = ceil(sqrt(number.toDouble)).toInt
         val result = mutable.Set[Int]()
         for (d <- 1 to upperLimit) do {
@@ -56,7 +56,7 @@ object PrimeNumbers {
         result.toSet
     }
 
-    /*def divisors(number: Int): List[Int] = {
+    def divisors(number: Int): List[Int] = {
         val primeFact = primeFactors(number)
         val result = ArrayBuffer[Int]()
         primeFact.foreach( (pf, exp) =>
@@ -74,7 +74,7 @@ object PrimeNumbers {
             result.addAll(combineWithPrevious)
         )
         (result += 1).toList
-    }*/
+    }
 
     def sigma(n: Int): Int = {
         var s = 1
