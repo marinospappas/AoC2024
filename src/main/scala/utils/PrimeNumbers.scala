@@ -6,7 +6,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.boundary
 import scala.util.boundary.break
-import scala.math.{pow, sqrt, ceil}
+import scala.math.{ceil, pow, sqrt}
 
 object PrimeNumbers {
 
@@ -26,7 +26,7 @@ object PrimeNumbers {
         primes
     }
 
-    def primeFactors(n: Int): Map[Int, Int] = {   // key = prime factor, value = exponent
+    def primeFactors(n: Int): List[(Int, Int)] = {   // (prime factor, exponent)
         val pFactors = mutable.Map[Int, Int]()
         var number = n
         boundary:
@@ -40,20 +40,7 @@ object PrimeNumbers {
             }
         if (number > 1)
             pFactors(number) = pFactors.getOrElseUpdate(number, 0) + 1
-        pFactors.toMap
-    }
-
-    def divisors2(number: Int): Set[Int] = {
-        val upperLimit = ceil(sqrt(number.toDouble)).toInt
-        val result = mutable.Set[Int]()
-        for (d <- 1 to upperLimit) do {
-            if (number % d == 0) {
-                result.add(d)
-                if (number / d != d)
-                    result.add(number / d)
-            }
-        }
-        result.toSet
+        pFactors.toList
     }
 
     def divisors(number: Int): List[Int] = {
@@ -76,11 +63,29 @@ object PrimeNumbers {
         (result += 1).toList
     }
 
+    def lcm(numbers: Set[Int]): Long = {
+        val pFactors = numbers.flatMap(primeFactors)
+        pFactors.map( _._1 ).map( f => pow(f.toDouble, pFactors.filter( _._1 == f ).map( _._2 ).max.toDouble).toLong ).product
+    }
+
+    def divisors2(number: Int): Set[Int] = {
+        val upperLimit = ceil(sqrt(number.toDouble)).toInt
+        val result = mutable.Set[Int]()
+        for (d <- 1 to upperLimit) do {
+            if (number % d == 0) {
+                result.add(d)
+                if (number / d != d)
+                    result.add(number / d)
+            }
+        }
+        result.toSet
+    }
+
     def sigma(n: Int): Int = {
         var s = 1
         val primeF = primeFactors(n)
-        for ( (key, value) <- primeF ) {
-            s *= (pow(key.toDouble, (value + 1).toDouble).toInt - 1) / (key - 1)
+        for ( (n, exp) <- primeF ) {
+            s *= (pow(n.toDouble, (exp + 1).toDouble).toInt - 1) / (n - 1)
         }
         s
     }
