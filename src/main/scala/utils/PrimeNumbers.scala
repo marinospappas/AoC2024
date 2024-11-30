@@ -63,22 +63,6 @@ object PrimeNumbers {
         (result += 1).toList
     }
 
-    def lcm(numbers: Set[Int]): Long = {
-        val pFactors = numbers.flatMap(primeFactors)
-        pFactors.map( _._1 ).map( f => pow(f.toDouble, pFactors.filter( _._1 == f ).map( _._2 ).max.toDouble).toLong ).product
-    }
-
-    def hcf(numbers: Set[Int]): Int = {
-        val pFactors = numbers.map(primeFactors).toList
-        var commonFactors: mutable.Set[Int] =  pFactors.head.map( _._1 ).to(mutable.Set)
-        for (i <- 1 until pFactors.size) do
-            commonFactors = commonFactors & pFactors(i).map( _._1 )
-        if (commonFactors.isEmpty)
-            return 1
-        val pFactorsFlat = pFactors.flatten
-        commonFactors.map( f => pow(f.toDouble, pFactorsFlat.filter(_._1 == f).map(_._2).min.toDouble).toInt ).product
-    }
-
     def divisors2(number: Int): Set[Int] = {
         val upperLimit = ceil(sqrt(number.toDouble)).toInt
         val result = mutable.Set[Int]()
@@ -138,3 +122,22 @@ extension (i: Int)
 
 extension (l: Long)
     def isPrime: Boolean = PrimeNumbers.primes.contains(l.toInt)
+    
+extension (numbers: Set[Int]) {
+ 
+    def lcm: Long = {
+        val pFactors = numbers.flatMap(PrimeNumbers.primeFactors)
+        pFactors.map(_._1).map(f => pow(f.toDouble, pFactors.filter(_._1 == f).map(_._2).max.toDouble).toLong).product
+    }
+
+    def hcf: Int = {
+        val pFactors = numbers.map(PrimeNumbers.primeFactors).toList
+        var commonFactors: mutable.Set[Int] = pFactors.head.map(_._1).to(mutable.Set)
+        for (i <- 1 until pFactors.size) do
+            commonFactors = commonFactors & pFactors(i).map(_._1)
+        if (commonFactors.isEmpty)
+            return 1
+        val pFactorsFlat = pFactors.flatten
+        commonFactors.map(f => pow(f.toDouble, pFactorsFlat.filter(_._1 == f).map(_._2).min.toDouble).toInt).product
+    }
+}

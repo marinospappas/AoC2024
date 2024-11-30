@@ -1,7 +1,7 @@
 package org.mpdev.scala.aoc2024
 package primenumbers
 
-import utils.PrimeNumbers
+import utils.{PrimeNumbers, lcm, hcf}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.prop.TableDrivenPropertyChecks.*
@@ -22,7 +22,7 @@ class TestLcmHcf extends AnyFlatSpec {
 
     it should "calculate lcm correctly" in {
         forAll (lcmParams) { (input: Set[Int], expected: Int) =>
-            PrimeNumbers.lcm(input).toInt shouldBe expected
+            input.lcm shouldBe expected
         }
     }
 
@@ -35,7 +35,7 @@ class TestLcmHcf extends AnyFlatSpec {
 
     it should "calculate hcf correctly" in {
         forAll(hcfParams) { (input: Set[Int], expected: Int) =>
-            PrimeNumbers.hcf(input) shouldBe expected
+            input.hcf shouldBe expected
         }
     }
 
@@ -43,17 +43,17 @@ class TestLcmHcf extends AnyFlatSpec {
         var result = 0L
         val start = System.currentTimeMillis()
         for (i <- 1 to 1000000) do {
-            result = PrimeNumbers.lcm(Set(12356, 84756, 998223, 123346))
+            result = Set(12356, 84756, 998223, 123346).lcm
         }
-        println(s"$result - ${System.currentTimeMillis() - start}msecs")
+        println(s"$result - ${System.currentTimeMillis() - start} msecs")
     }
 
     it should "perform multiple hcf calculations" in {
         var result = 0L
         val start = System.currentTimeMillis()
         for (i <- 1 to 1000000) do {
-            result = PrimeNumbers.hcf(Set(12356, 84756, 998223, 123346))
+            result = Set(2108, 31372, 9796, 131316).hcf
         }
-        println(s"$result - ${System.currentTimeMillis() - start}msecs")
+        println(s"$result - ${System.currentTimeMillis() - start} msecs")
     }
 }
