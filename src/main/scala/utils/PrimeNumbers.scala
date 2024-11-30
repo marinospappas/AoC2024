@@ -73,6 +73,8 @@ object PrimeNumbers {
         var commonFactors: mutable.Set[Int] =  pFactors.head.map( _._1 ).to(mutable.Set)
         for (i <- 1 until pFactors.size) do
             commonFactors = commonFactors & pFactors(i).map( _._1 )
+        if (commonFactors.isEmpty)
+            return 1
         val pFactorsFlat = pFactors.flatten
         commonFactors.map( f => pow(f.toDouble, pFactorsFlat.filter(_._1 == f).map(_._2).min.toDouble).toInt ).product
     }
