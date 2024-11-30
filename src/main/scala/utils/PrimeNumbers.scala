@@ -2,7 +2,7 @@ package org.mpdev.scala.aoc2024
 package utils
 
 import scala.collection.immutable.Set
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 import scala.collection.mutable.ArrayBuffer
 import scala.util.boundary
 import scala.util.boundary.break
@@ -26,7 +26,7 @@ object PrimeNumbers {
         primes
     }
 
-    def primeFactors(n: Int): List[(Int, Int)] = {   // (prime factor, exponent)
+    def primeFactors(n: Int): Set[(Int, Int)] = {   // (prime factor, exponent)
         val pFactors = mutable.Map[Int, Int]()
         var number = n
         boundary:
@@ -40,7 +40,7 @@ object PrimeNumbers {
             }
         if (number > 1)
             pFactors(number) = pFactors.getOrElseUpdate(number, 0) + 1
-        pFactors.toList
+        pFactors.toSet
     }
 
     def divisors(number: Int): List[Int] = {
@@ -66,6 +66,15 @@ object PrimeNumbers {
     def lcm(numbers: Set[Int]): Long = {
         val pFactors = numbers.flatMap(primeFactors)
         pFactors.map( _._1 ).map( f => pow(f.toDouble, pFactors.filter( _._1 == f ).map( _._2 ).max.toDouble).toLong ).product
+    }
+
+    def hcf(numbers: Set[Int]): Int = {
+        val pFactors = numbers.map(primeFactors).toList
+        var commonFactors: mutable.Set[Int] =  pFactors.head.map( _._1 ).to(mutable.Set)
+        for (i <- 1 until pFactors.size) do
+            commonFactors = commonFactors & pFactors(i).map( _._1 )
+        val pFactorsFlat = pFactors.flatten
+        commonFactors.map( f => pow(f.toDouble, pFactorsFlat.filter(_._1 == f).map(_._2).min.toDouble).toInt ).product
     }
 
     def divisors2(number: Int): Set[Int] = {
