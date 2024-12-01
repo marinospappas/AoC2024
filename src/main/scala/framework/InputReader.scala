@@ -8,10 +8,11 @@ object InputReader {
 
     private val filePattern = AocMain.environment match
         case "prod" => "src/main/resources/input/input"
-        case _ => "src/test/resources/input/input"
+        case "test" => "src/test/resources/input/input"
+        case "none" => ""
 
     def read(day: Int, pattern: String = filePattern, extension: String = "txt"): List[String] = {
-        if (AocMain.environment == "none")
+        if (filePattern.isEmpty)
             return List()
         val name =  f"$pattern$day%02d.$extension"
         val source = fromFile(name)
