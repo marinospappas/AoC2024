@@ -2,15 +2,13 @@ package org.mpdev.scala.aoc2024
 package solutions.day01
 
 import framework.{AoCException, InputReader, PuzzleSolver}
-import scala.collection.mutable.ArrayBuffer
 import scala.math.abs
 
 class LocationAnalyser extends PuzzleSolver {
 
     val (listA, listB) = {
-        val (l1, l2) = (ArrayBuffer[Int](), ArrayBuffer[Int]())
-        InputReader.read(1).map(s => toPair"$s").foreach(pair => { l1 += pair._1; l2 += pair._2 })
-        (l1.toList, l2.toList)
+        val tempList = InputReader.read(1).map(s => toPair"$s")
+        (tempList.map(_._1), tempList.map(_._2))
     }
     
     override def part1: Any = {
