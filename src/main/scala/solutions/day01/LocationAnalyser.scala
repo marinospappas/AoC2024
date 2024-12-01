@@ -7,9 +7,12 @@ import scala.math.abs
 
 class LocationAnalyser extends PuzzleSolver {
 
-    val (listA, listB) = (ArrayBuffer[Int](), ArrayBuffer[Int]())
-    InputReader.read(1).map( s => toPair"$s" ).foreach( pair => { listA += pair._1; listB += pair._2 } )
-
+    val (listA, listB) = {
+        val (l1, l2) = (ArrayBuffer[Int](), ArrayBuffer[Int]())
+        InputReader.read(1).map(s => toPair"$s").foreach(pair => { l1 += pair._1; l2 += pair._2 })
+        (l1.toList, l2.toList)
+    }
+    
     override def part1: Any = {
         val (l1, l2) = (listA.sorted, listB.sorted)
         l1.indices.map( i => abs(l1(i) - l2(i)) ).sum
