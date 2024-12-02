@@ -10,7 +10,7 @@ class LocationAnalyser extends PuzzleSolver {
         val tempList = InputReader.read(1).map(s => toPair"$s")
         (tempList.map(_._1), tempList.map(_._2))
     }
-    
+
     override def part1: Any = {
         val (l1, l2) = (listA.sorted, listB.sorted)
         l1.indices.map( i => abs(l1(i) - l2(i)) ).sum

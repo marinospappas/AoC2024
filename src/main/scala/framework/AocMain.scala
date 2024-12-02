@@ -23,7 +23,7 @@ def aoc2024(args: String*): Unit = {
     if (!solvers.contains(day))
         throw AoCException(s"Solver for Day $day Not Configured")
     val solver = solvers(day)
-    println(s"\nSolving AoC 2015 day $day")
+    println(s"\nSolving AoC 2024 day $day")
     val solution1 = time(solver.part1)
     val solution2 = time(solver.part2)
     println(s"  Part 1: ${solution1(0)}   in ${solution1(1)} msecs")
