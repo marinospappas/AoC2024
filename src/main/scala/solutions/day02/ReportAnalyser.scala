@@ -23,8 +23,8 @@ class ReportAnalyser extends PuzzleSolver {
             else {
                 boundary:
                     for (index <- r.indices) {
-                        val a = r.to(ArrayBuffer)
-                        if ({ a.remove(index)
+                        if ({ val a = r.to(ArrayBuffer)
+                            a.remove(index)
                             a.toList.isSafe }) {
                             safeCount += 1
                             break()
@@ -35,18 +35,13 @@ class ReportAnalyser extends PuzzleSolver {
         safeCount
 
     extension (l: List[Int])
-        def isSafe: Boolean = {
+        private def isSafe: Boolean = {
             val lSorted = l.sorted
-            if (l != lSorted && l != lSorted.reverse)
-                return false
-            var safe = true
-            boundary:
-                for (i <- 0 to l.size - 2) do
-                    if (abs(l(i) - l(i+1)) > 3 || l(i) == l(i+1)) {
-                        safe = false
-                        break()
-                    }
-            safe
+            val ascending = l == lSorted
+            val descending = l == lSorted.reverse
+            val result = (ascending || descending) &&
+                l.sliding(2).forall( a => a.head != a(1) && abs(a.head - a(1)) <= 3 )
+            result
         }
 
     extension (s: String)

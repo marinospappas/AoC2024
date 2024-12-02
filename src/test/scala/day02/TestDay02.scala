@@ -16,7 +16,11 @@ class TestDay02 extends AnyFlatSpec {
         solver.reports.foreach(println(_))
         solver.reports.size shouldBe 6
     }
-    
+
+    it should "do sliding window" in {
+        List(1,2,3,4,5,6).sliding(2).foreach(println(_))
+    }
+
     it should "solve part1 correctly" in {
         solver.part1 shouldBe 2
     }
