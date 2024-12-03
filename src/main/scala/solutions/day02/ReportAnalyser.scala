@@ -37,11 +37,9 @@ class ReportAnalyser extends PuzzleSolver {
     extension (l: List[Int])
         private def isSafe: Boolean = {
             val lSorted = l.sorted
-            val ascending = l == lSorted
-            val descending = l == lSorted.reverse
-            val result = (ascending || descending) &&
-                l.sliding(2).forall( a => a.head != a(1) && abs(a.head - a(1)) <= 3 )
-            result
+            val sorted = l == lSorted
+            val reverseSorted = l == lSorted.reverse
+            (sorted || reverseSorted) && l.sliding(2).forall( a => a.head != a(1) && abs(a.head - a(1)) <= 3 )
         }
 
     extension (s: String)

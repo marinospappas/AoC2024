@@ -8,10 +8,8 @@ class LocationAnalyser extends PuzzleSolver {
 
     val (listA, listB) = InputReader.read(1).map(s => toPair"$s").unzip
 
-    override def part1: Any = {
-        val (l1, l2) = (listA.sorted, listB.sorted)
-        l1.indices.map( i => abs(l1(i) - l2(i)) ).sum
-    }
+    override def part1: Any =
+        listA.sorted.zip(listB.sorted).map( (i1, i2) => abs(i1 - i2) ).sum
 
     override def part2: Any =
         listA.map( a => a * listB.count( b => b == a ) ).sum

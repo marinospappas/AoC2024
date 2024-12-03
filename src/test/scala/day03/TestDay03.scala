@@ -13,7 +13,7 @@ class TestDay03 extends AnyFlatSpec {
 
     it should "read input and setup program memory" in {
         println(solver.inputData)
-        solver.inputData.length shouldBe 83
+        solver.inputData.length shouldBe 149
     }
 
     it should "solve part1 correctly" in {
