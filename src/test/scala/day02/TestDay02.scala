@@ -12,13 +12,9 @@ class TestDay02 extends AnyFlatSpec {
     AocMain.environment = "test"
     private val solver = ReportAnalyser()
 
-    it should "read input and setup parcels list" in {
+    it should "read input and setup reports list" in {
         solver.reports.foreach(println(_))
         solver.reports.size shouldBe 6
-    }
-
-    it should "do sliding window" in {
-        List(1,2,3,4,5,6).sliding(2).foreach(println(_))
     }
 
     it should "solve part1 correctly" in {

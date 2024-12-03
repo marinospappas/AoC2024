@@ -6,10 +6,7 @@ import scala.math.abs
 
 class LocationAnalyser extends PuzzleSolver {
 
-    val (listA, listB) = {
-        val tempList = InputReader.read(1).map(s => toPair"$s")
-        tempList.unzip
-    }
+    val (listA, listB) = InputReader.read(1).map(s => toPair"$s").unzip
 
     override def part1: Any = {
         val (l1, l2) = (listA.sorted, listB.sorted)
