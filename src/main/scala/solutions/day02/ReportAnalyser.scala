@@ -18,13 +18,11 @@ class ReportAnalyser extends PuzzleSolver {
     override def part2: Any =
         reports.filter(r => !r.isSafe).map( r => {
             boundary:
-                for (index <- r.indices) do {
-                    if ( {val a = r.to(ArrayBuffer)
+                for index <- r.indices do
+                    if { val a = r.to(ArrayBuffer)
                         a.remove(index)
                         a.toList.isSafe
-                    })
-                        break(1)
-                }
+                    } then break(1)
                 0
         }).sum + reports.count( r => r.isSafe )
 
