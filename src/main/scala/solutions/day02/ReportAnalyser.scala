@@ -16,23 +16,17 @@ class ReportAnalyser extends PuzzleSolver {
         reports.count( r => r.isSafe )
 
     override def part2: Any =
-        var safeCount = 0
-        for (r <- reports) {
-            if (r.isSafe)
-                safeCount += 1
-            else {
-                boundary:
-                    for (index <- r.indices) {
-                        if ({ val a = r.to(ArrayBuffer)
-                            a.remove(index)
-                            a.toList.isSafe }) {
-                            safeCount += 1
-                            break()
-                        }
-                    }
-            }
-        }
-        safeCount
+        reports.filter(r => !r.isSafe).map( r => {
+            boundary:
+                for (index <- r.indices) do {
+                    if ( {val a = r.to(ArrayBuffer)
+                        a.remove(index)
+                        a.toList.isSafe
+                    })
+                        break(1)
+                }
+                0
+        }).sum + reports.count( r => r.isSafe )
 
     extension (l: List[Int])
         private def isSafe: Boolean = {
