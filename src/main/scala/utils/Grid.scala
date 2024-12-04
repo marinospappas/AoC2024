@@ -29,9 +29,7 @@ open class Grid[T](gridData: Map[Point,T],
 
     def setDataPoints(dataPoints: Map[Point,T]): Unit = data.empty ++ dataPoints
 
-    def getDataPoint(p: Point): T = data(p)
-
-    def getDataPointOrNull(p: Point): T | Null = data.getOrElse(p, null)
+    def getDataPoint(p: Point): T | Null = data.getOrElse(p, null)
     
     def getDataPointOptional(p: Point): Option[T] = data.get(p)
     

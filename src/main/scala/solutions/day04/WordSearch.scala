@@ -2,7 +2,6 @@ package org.mpdev.scala.aoc2024
 package solutions.day04
 
 import framework.{InputReader, PuzzleSolver}
-
 import utils.{Grid, GridBuilder, GridUtils, Point}
 import utils.GridUtils.Direction.*
 
@@ -13,7 +12,7 @@ class WordSearch extends PuzzleSolver {
     private val (startOfSearchPart1, startOfSearchPart2) = (searchWord.head, 'A')
 
     def matchesWord(point: Point, direction: GridUtils.Direction): Boolean = {
-        val checkWord = searchWord.indices.map( i => grid.getDataPointOrNull(point + direction.increment * i) ).mkString
+        val checkWord = searchWord.indices.map( i => grid.getDataPoint(point + direction.increment * i) ).mkString
         searchWord == checkWord
     }
 
@@ -25,7 +24,7 @@ class WordSearch extends PuzzleSolver {
     private def matchesXMas(p: Point): Boolean = {
         grid.getDataPoint(p) == startOfSearchPart2 &&
             Set("MMSS", "SMMS", "SSMM", "MSSM")
-                .contains(List(NW, NE, SE, SW).map(dir => grid.getDataPointOrNull(p + dir.increment)).mkString)
+                .contains(List(NW, NE, SE, SW).map(dir => grid.getDataPoint(p + dir.increment)).mkString)
     }
 
     override def part1: Any =
