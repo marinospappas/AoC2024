@@ -31,7 +31,7 @@ def aoc2024(args: String*): Unit = {
     if (args.isEmpty)
         usage()
     if (args(0) == "all")
-        solvers.keys.foreach(solveDay)
-    else 
+        solvers.keys.toList.sorted.foreach(solveDay)
+    else
         solveDay(args(0).toIntOption.getOrElse(throw AoCException(s"bad argument for day: ${args(0)}")))
 }
