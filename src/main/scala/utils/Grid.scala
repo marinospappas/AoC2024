@@ -30,9 +30,11 @@ open class Grid[T](gridData: Map[Point,T],
     def setDataPoints(dataPoints: Map[Point,T]): Unit = data.empty ++ dataPoints
 
     def getDataPoint(p: Point): T = data(p)
+
+    def getDataPointOrNull(p: Point): T | Null = data.getOrElse(p, null)
     
     def getDataPointOptional(p: Point): Option[T] = data.get(p)
-
+    
     def setDataPoint(p: Point, t: T): Unit = data += p -> t
 
     def containsDataPoint(p: Point): Boolean = data.contains(p)
@@ -129,7 +131,7 @@ open class Grid[T](gridData: Map[Point,T],
 
     private def printGrid(grid: Array[Array[Char]]): Unit =
         for (i <- grid.indices)
-            print(f"${i%100}%2d")
+            print(f"${i%100}%2d ")
             for (j <- grid.head.indices)
                 print(grid(i)(j))
             println("")
