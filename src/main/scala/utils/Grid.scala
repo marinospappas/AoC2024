@@ -2,10 +2,11 @@ package org.mpdev.scala.aoc2024
 package utils
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 open class Grid[T](gridData: Map[Point,T],
                    mapper: Map[Char,T] = Grid.allCharsDefMapper,
-                   border: Int = 0,
+                   borderWidth: Int = 0,
                    defaultChar: Char = '.',
                    defaultSize: (Int, Int) = (-1,-1)) {
 
@@ -16,10 +17,11 @@ open class Grid[T](gridData: Map[Point,T],
     private var minY: Int = 0
     private var DEFAULT_CHAR = '.'
     private var cornerPoints: Set[Point] = Set()
+    private var border: List[Point] = List()
 
     {
         data ++= gridData
-        updateXYDimensions(border)
+        updateXYDimensions(borderWidth)
         DEFAULT_CHAR = defaultChar
     }
 
@@ -30,9 +32,9 @@ open class Grid[T](gridData: Map[Point,T],
     def setDataPoints(dataPoints: Map[Point,T]): Unit = data.empty ++ dataPoints
 
     def getDataPoint(p: Point): T | Null = data.getOrElse(p, null)
-    
+
     def getDataPointOptional(p: Point): Option[T] = data.get(p)
-    
+
     def setDataPoint(p: Point, t: T): Unit = data += p -> t
 
     def containsDataPoint(p: Point): Boolean = data.contains(p)
@@ -72,6 +74,8 @@ open class Grid[T](gridData: Map[Point,T],
     def getDimensions: (Int, Int) = (maxX-minX+1, maxY-minY+1)
     def getMinMaxXY: (Int, Int, Int, Int) = (minX, maxX, minY, maxY)
     def getCorners: Set[Point] = cornerPoints
+    def getBorder: List[Point] = border
+
     def countOf(item: T): Int = data.count( _._2 == item )
 
     def firstPoint(): Point = Point(minX, minY)
@@ -80,7 +84,11 @@ open class Grid[T](gridData: Map[Point,T],
 
     def isInsideGrid(p: Point): Boolean = (minX to maxX).contains(p.x) && (minY to maxY).contains(p.y)
 
-    def updateDimensions(): Unit = updateXYDimensions(border)
+    def isOnBorder(p: Point): Boolean =
+        Set(minX, maxX).contains(p.x) && (minY to maxY).contains(p.y) ||
+            (minX to maxX).contains(p.x) && Set(minY, maxY).contains(p.y)
+        
+    def updateDimensions(): Unit = updateXYDimensions(borderWidth)
 
     def getRowAsList(n: Int): List[T] = data.filter(_._1.y == n).values.toList
 
@@ -97,23 +105,31 @@ open class Grid[T](gridData: Map[Point,T],
     def mapColToInt(n: Int, predicate: T => Boolean = { _ => true }): Int =
         data.filter( e => predicate(e._2) && e._1.x == n ).map ( e => Grid.bitToInt(e._1.y) ).sum
 
-    private def updateXYDimensions(border: Int): Unit =
+    private def updateXYDimensions(borderWidth: Int): Unit = {
         if (defaultSize._1 > 0 && defaultSize._2 > 0)
             minX = 0
             maxX = defaultSize._1 - 1
             minX = 0
             maxY = defaultSize._2 - 1
         else if (data.nonEmpty)
-            maxX = data.keys.map(_.x).max + border
-            maxY = data.keys.map(_.y).max + border
-            minX = data.keys.map(_.x).min - border
-            minY = data.keys.map(_.y).min - border
+            maxX = data.keys.map(_.x).max + borderWidth
+            maxY = data.keys.map(_.y).max + borderWidth
+            minX = data.keys.map(_.x).min - borderWidth
+            minY = data.keys.map(_.y).min - borderWidth
         else
             maxX = 0
             maxY = 0
             minX = 0
             minY = 0
         cornerPoints = Set(Point(minX, minY), Point(minX, maxY), Point(maxX, minY), Point(maxX, maxY))
+        val gridBorder = ArrayBuffer[Point]()
+        (minX to maxX).foreach(x => gridBorder += Point(x, minY))
+        (minY + 1 to maxY).foreach(y => gridBorder += Point(maxX, y))
+        (maxX - 1 to minX by -1).foreach(x => gridBorder += Point(x, maxY))
+        (maxY - 1 to minY + 1 by -1).foreach(y => gridBorder += Point(minX, y))
+        border = gridBorder.toList
+    }
+
 
     private def data2Grid(): Array[Array[Char]] =
         val grid: Array[Array[Char]] = Array.fill(maxY-minY+1) { Array.fill(maxX-minX+1) { DEFAULT_CHAR } }
