@@ -17,9 +17,6 @@ class PrintingRules extends PuzzleSolver {
         g
     }
 
-    private def sortWithCustomOrder(n1: Int, n2: Int, order: List[Int]): Boolean =
-        order.indexOf(n1) < order.indexOf(n2)
-
     override def part1: Any =
         manSections.filter (l => orderingRules.forall (r => l.applyRule(r))).map (l => l(l.size / 2)).sum
 
@@ -28,7 +25,7 @@ class PrintingRules extends PuzzleSolver {
             .filter (l => orderingRules.exists (r => !l.applyRule(r) ))
             .map (l => {
                 val sortOrder = graphOf(orderingRules, l).topologicalSort()
-                l.sortWith((i1, i2) => sortWithCustomOrder(i1, i2, sortOrder))
+                l.sortWith((n1, n2) => sortOrder.indexOf(n1) < sortOrder.indexOf(n2))
             })
             .map (l => l(l.size / 2)).sum
 
