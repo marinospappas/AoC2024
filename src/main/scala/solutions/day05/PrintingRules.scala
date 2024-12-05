@@ -27,9 +27,9 @@ class PrintingRules extends PuzzleSolver {
         manSections
             .filter (l => orderingRules.exists (r => !l.applyRule(r) ))
             .map (l => {
-                val g = graphOf(orderingRules, l)
-                l.sortWith((i1, i2) => sortWithCustomOrder(i1, i2, g.topologicalSort()))
-            } )
+                val sortOrder = graphOf(orderingRules, l).topologicalSort()
+                l.sortWith((i1, i2) => sortWithCustomOrder(i1, i2, sortOrder))
+            })
             .map (l => l(l.size / 2)).sum
 
     // input parsing
