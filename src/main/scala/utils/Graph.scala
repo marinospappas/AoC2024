@@ -2,6 +2,7 @@ package org.mpdev.scala.aoc2024
 package utils
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * graph class
@@ -67,13 +68,13 @@ open class Graph[T](
         dfsMaxPath(start, isAtEnd, mutable.Map(), includeAllNodes)
 
     //TODO: refactor the below function to use Stack instead of recursion
-    private def dfsMaxPath(cur: T, isAtEnd: T => Boolean, visited: mutable.Map[T, Int], includeAllNodes: Boolean): Int =
+    private def dfsMaxPath(cur: T, isAtEnd: T => Boolean, visited: mutable.Map[T, Int], includeAllNodes: Boolean): Int = {
         if (isAtEnd(cur) && (if (includeAllNodes) visited.size == nodes.size else visited.nonEmpty))
             return visited.values.sum()
-            
+
         var maxPath = Int.MinValue
-        getConnected(cur).foreach ( (neighbor, steps) =>
-            if (! visited.contains(neighbor))
+        getConnected(cur).foreach((neighbor, steps) =>
+            if (!visited.contains(neighbor))
                 visited += neighbor -> steps
                 val res = dfsMaxPath(neighbor, isAtEnd, visited, includeAllNodes)
                 if (res > maxPath)
@@ -81,7 +82,40 @@ open class Graph[T](
                 visited.remove(neighbor)
         )
         maxPath
-        
+    }
+
+    // topological sort of the whole graph with cycle detection
+    def topologicalSort(cycles: ArrayBuffer[List[T]] | Null = null): List[T] = {
+        val stack: mutable.Stack[T] = mutable.Stack()
+        val visited: mutable.Set[T] = mutable.Set()
+        for (node <- getNodes) do {
+            if !visited.contains(node) then
+                topologicalSortDfs(node, visited, stack)
+        }
+        if cycles != null then {    // detect cycles
+            getConnected(stack.last).map(_._1).foreach(cnx =>
+                if stack.contains(cnx) then cycles += (stack.toList :+ cnx)
+            )
+        }
+        stack.toList
+    }
+
+    // topological sort of part of the graph starting at specific node
+    def topologicalSort(node: T): List[T] = {
+        val stack: mutable.Stack[T] = mutable.Stack()
+        val visited: mutable.Set[T] = mutable.Set()
+        topologicalSortDfs(node, visited, stack)
+        stack.toList
+    }
+    
+    private def topologicalSortDfs(node: T, visited: mutable.Set[T], stack: mutable.Stack[T]): Unit = {
+        visited.add(node)
+        for cnx <- getConnected(node).map(_._1) do {
+            if !visited.contains(cnx) then
+                topologicalSortDfs(cnx, visited, stack)
+        }
+        stack.push(node)
+    }
 }
 
 object Graph {

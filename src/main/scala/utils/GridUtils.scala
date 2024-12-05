@@ -23,33 +23,38 @@ object GridUtils {
         case DOWN_LEFT extends Direction(Point(-1, 1))
         case SW extends Direction(Point(-1, 1))
         
+        case NONE extends Direction(Point(0, 0))
+        
+        def turn (leftRight: Direction): Direction = if leftRight == RIGHT then turnRight() else turnLeft()
+
+        def turn (leftRight: Int): Direction = if (leftRight == 1) turnRight() else turnLeft()
+
+        extension( dir: Direction ) {
+            def turnRight(): Direction = dir match
+                case UP => RIGHT
+                case RIGHT => DOWN
+                case DOWN => LEFT
+                case LEFT => UP
+                case _ => NONE
+
+            def turnLeft(): Direction = dir match
+                case UP => LEFT
+                case LEFT => DOWN
+                case DOWN => RIGHT
+                case RIGHT => UP
+                case _ => NONE
+
+            def reverse(): Direction = dir match
+                case UP => DOWN
+                case LEFT => RIGHT
+                case DOWN => UP
+                case RIGHT => LEFT
+                case _ => NONE    
+
+        }
+
         /*
-        fun turn (leftRight: Direction) = if (leftRight == RIGHT) turnRight() else turnLeft()
-
-        fun turn (leftRight: Int) = if (leftRight == 1) turnRight() else turnLeft()
-
-        fun turnRight() = when(this) {
-            UP -> RIGHT;
-            RIGHT -> DOWN;
-            DOWN -> LEFT;
-            LEFT -> UP
-        }
-
-        fun turnLeft() = when(this) {
-            UP -> LEFT;
-            LEFT -> DOWN;
-            DOWN -> RIGHT;
-            RIGHT -> UP
-        }
-
-        fun reverse() = when(this) {
-            UP -> DOWN;
-            RIGHT -> LEFT;
-            DOWN -> UP;
-            LEFT -> RIGHT
-        }
-
-        fun toString1() = when(this) {
+         fun toString1() = when(this) {
             UP -> "U";
             RIGHT -> "R";
             DOWN -> "D";
