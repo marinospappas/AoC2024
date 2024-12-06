@@ -13,7 +13,7 @@ class PrintingRules extends PuzzleSolver {
     private def graphOf(rules: List[(Int, Int)], constraints: List[Int]): Graph[Int] = {
         val g = Graph[Int]()
         rules.filter ( r => Set(r._1, r._2).forall (constraints.contains) )
-            .foreach((v1, v2) => { g.addNode(v1, v2); g.addNode(v2) })
+            .foreach ((v1, v2) => { g.addNode(v1, v2); g.addNode(v2) })
         g
     }
 
@@ -22,7 +22,7 @@ class PrintingRules extends PuzzleSolver {
 
     override def part2: Any =
         manSections
-            .filter (l => orderingRules.exists (r => !l.applyRule(r) ))
+            .filter (l => orderingRules.exists (r => !l.applyRule(r)))
             .map (l => {
                 val sortOrder = graphOf(orderingRules, l).topologicalSort()
                 l.sortWith((n1, n2) => sortOrder.indexOf(n1) < sortOrder.indexOf(n2))
