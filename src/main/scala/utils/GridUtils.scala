@@ -6,13 +6,15 @@ object GridUtils {
     enum Direction(val increment: Point, val symbol: Char = 'x') {
         // cardinal
         case UP extends Direction(Point(0, -1), '^')
-        case N extends Direction(Point(0, -1))
         case RIGHT extends Direction(Point(1, 0), '>')
-        case E extends Direction(Point(1, 0))
         case DOWN extends Direction(Point(0, 1), 'v')
-        case S extends Direction(Point(0, 1))
         case LEFT extends Direction(Point(-1, 0), '<')
+
+        case N extends Direction(Point(0, -1))
+        case E extends Direction(Point(1, 0))
+        case S extends Direction(Point(0, 1))
         case W extends Direction(Point(-1, 0))
+
         // diagonal
         case UP_RIGHT extends Direction(Point(1, -1))
         case NE extends Direction(Point(1, -1))
@@ -29,29 +31,26 @@ object GridUtils {
 
         def turn (leftRight: Int): Direction = if (leftRight == 1) turnRight else turnLeft
 
-       // extension( dir: Direction ) {
-            def turnRight: Direction = this match
-                case UP => RIGHT
-                case RIGHT => DOWN
-                case DOWN => LEFT
-                case LEFT => UP
-                case _ => NONE
+        def turnRight: Direction = this match
+            case UP => RIGHT
+            case RIGHT => DOWN
+            case DOWN => LEFT
+            case LEFT => UP
+            case _ => NONE
 
-            def turnLeft: Direction = this match
-                case UP => LEFT
-                case LEFT => DOWN
-                case DOWN => RIGHT
-                case RIGHT => UP
-                case _ => NONE
+        def turnLeft: Direction = this match
+            case UP => LEFT
+            case LEFT => DOWN
+            case DOWN => RIGHT
+            case RIGHT => UP
+            case _ => NONE
 
-            def reverse: Direction = this match
-                case UP => DOWN
-                case LEFT => RIGHT
-                case DOWN => UP
-                case RIGHT => LEFT
-                case _ => NONE    
-
-        //}
+        def reverse: Direction = this match
+            case UP => DOWN
+            case LEFT => RIGHT
+            case DOWN => UP
+            case RIGHT => LEFT
+            case _ => NONE
 
         /*
          fun toString1() = when(this) {
