@@ -7,16 +7,22 @@ import scala.collection.mutable.ArrayBuffer
 
 class BridgeRepair extends PuzzleSolver {
 
-    val inputData: List[(Long, List[Long])] = InputReader.read(7).map (s => { val (i, l) = parse(s); i -> l})
+    val inputData: List[(Long, List[Long])] = InputReader.read(7).map (s => { val (i, l) = parse(s); (i, l) })
 
-    //TODO: debug recursive version
-    private def matchListR(l: List[Long], expected: Long): Boolean = {
-        if l.size == 2 then l.head + l(1) == expected || l.head * l(1) == expected
-        else matchList(l.slice(1, l.size), expected - l.head)
-            || matchList(l.slice(1, l.size), expected / l.head)
+    private def matchTwo(n1: Long, n2: Long, expected: Long, part2: Boolean): Boolean =
+        n1 + n2 == expected || n1 * n2 == expected || (part2 && (n2.toString + n1.toString).toLong == expected)
+
+    private def matchListDp(l: List[Long], expected: Long, part2: Boolean = false): Boolean = {
+        if l.size == 2 then matchTwo(l.head, l(1), expected, part2)
+        else expected > l.head && matchListDp(l.slice(1, l.size), expected - l.head, part2)
+            || expected % l.head == 0 && matchListDp(l.slice(1, l.size), expected / l.head, part2)
+            || part2 && expected.toString.length > l.head.toString.length && expected.toString.endsWith(l.head.toString)
+                && matchListDp(l.slice(1, l.size), expected.toString.substring(0, expected.toString.length - l.head.toString.length).toLong, part2)
     }
 
-    private def matchList(list: List[Long], expected: Long, part2: Boolean = false): Boolean = {
+    // alternative "naive" algorithm that calculates all the numbers from all the possible combinations of +, * and ||
+    // much slower than DP
+    private def matchListLoop(list: List[Long], expected: Long, part2: Boolean = false): Boolean = {
         var currentCollection = ArrayBuffer[Long](list.head + list(1), list.head * list(1))
         if part2 then currentCollection += (list.head.toString + list(1).toString).toLong
         var l = list.slice(2, list.size)
@@ -32,11 +38,11 @@ class BridgeRepair extends PuzzleSolver {
     }
 
     override def part1: Any =
-        val res = inputData.filter((exp, list) => matchList(list, exp))
+        val res = inputData.filter((exp, list) => matchListDp(list.reverse, exp))
         res.map(_._1).sum
 
     override def part2: Any =
-        val res = inputData.filter((exp, list) => matchList(list, exp, part2 = true))
+        val res = inputData.filter((exp, list) => matchListDp(list.reverse, exp, part2 = true))
         res.map(_._1).sum
 
     // input parsing
