@@ -3,6 +3,7 @@ package solutions.day06
 
 import framework.{AoCException, InputReader, PuzzleSolver}
 import utils.SimpleGrid
+import utils.SimpleGrid.Direction
 import utils.SimpleGrid.Direction.*
 
 import scala.collection.mutable
@@ -22,8 +23,8 @@ class MapRouteExplorer extends PuzzleSolver {
     private val NUM_THREADS = 4
 
     // returns false if loop detected
-    private def walkMap(grid: SimpleGrid[Char], start: (Int, Int, SimpleGrid.Direction),
-                        route: ArrayBuffer[(Int, Int, SimpleGrid.Direction)], obstaclePoint: (Int, Int) = (-1,-1)): Boolean = {
+    private def walkMap(grid: SimpleGrid[Char], start: (Int, Int, Direction),
+                        route: ArrayBuffer[(Int, Int, Direction)], obstaclePoint: (Int, Int) = (-1,-1)): Boolean = {
         var (curX, curY, facing) = start
         // a temporary map is used to build the route so that the lookup for previous points in the route can be done fast (as key lookup)        
         val thisRoute = mutable.Map[(Int, Int, SimpleGrid.Direction), Int]()
@@ -47,14 +48,14 @@ class MapRouteExplorer extends PuzzleSolver {
             true
     }
 
-    private def identifyObstructionPoints(threadId: Int, route: List[(Int, Int, SimpleGrid.Direction)]): List[(Int, Int)] = {
+    private def identifyObstructionPoints(threadId: Int, route: List[(Int, Int, Direction)]): List[(Int, Int)] = {
         println(s">>t$threadId")
         val obstructions = ArrayBuffer[(Int, Int)]()
         for i <- 1 until route.size do {
             if i % NUM_THREADS == threadId then {     // only pickup those points that are for this thread - based on %
                 val curPos = (route(i)._1, route(i)._2)
                 if guardRoutePoints.indexOf(curPos) == i then {
-                    if !walkMap(mapGrid, route(i - 1), ArrayBuffer[(Int, Int, SimpleGrid.Direction)]() ++ route.slice(0, i - 1), curPos) then
+                    if !walkMap(mapGrid, route(i - 1), ArrayBuffer[(Int, Int, Direction)]() ++ route.slice(0, i - 1), curPos) then
                         obstructions += curPos
                 }
             }
@@ -63,7 +64,7 @@ class MapRouteExplorer extends PuzzleSolver {
         obstructions.toList
     }
 
-    var guardRoute: ArrayBuffer[(Int, Int, SimpleGrid.Direction)] = ArrayBuffer()
+    var guardRoute: ArrayBuffer[(Int, Int, Direction)] = ArrayBuffer()
     private var guardRoutePoints: List[(Int, Int)] = List()
 
     override def part1: Any = {
