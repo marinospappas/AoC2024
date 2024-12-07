@@ -25,7 +25,7 @@ class MapRouteExplorer extends PuzzleSolver {
     private def walkMap(grid: SimpleGrid[Char], start: (Int, Int, SimpleGrid.Direction),
                         route: ArrayBuffer[(Int, Int, SimpleGrid.Direction)], obstaclePoint: (Int, Int) = (-1,-1)): Boolean = {
         var (curX, curY, facing) = start
-        // a temporary map is used to build the route so that the lookup for previous points in the route can be done fast
+        // a temporary map is used to build the route so that the lookup for previous points in the route can be done fast (as key lookup)        
         val thisRoute = mutable.Map[(Int, Int, SimpleGrid.Direction), Int]()
         var routeIndex = 0
         boundary:
@@ -43,7 +43,7 @@ class MapRouteExplorer extends PuzzleSolver {
                 curY = nextPosition._2
             }
             // now update the real route
-            thisRoute.toList.sortBy(_._2).foreach( route += _._1)
+            thisRoute.toList.sortBy(_._2).foreach(route += _._1)
             true
     }
 
@@ -51,11 +51,10 @@ class MapRouteExplorer extends PuzzleSolver {
         println(s">>t$threadId")
         val obstructions = ArrayBuffer[(Int, Int)]()
         for i <- 1 until route.size do {
-            if i % NUM_THREADS == threadId then {
+            if i % NUM_THREADS == threadId then {     // only pickup those points that are for this thread - based on %
                 val curPos = (route(i)._1, route(i)._2)
-                val curRoute = route.slice(0, i - 1)
                 if guardRoutePoints.indexOf(curPos) == i then {
-                    if !walkMap(mapGrid, route(i - 1), ArrayBuffer[(Int, Int, SimpleGrid.Direction)]() ++ curRoute, curPos) then
+                    if !walkMap(mapGrid, route(i - 1), ArrayBuffer[(Int, Int, SimpleGrid.Direction)]() ++ route.slice(0, i - 1), curPos) then
                         obstructions += curPos
                 }
             }
@@ -88,7 +87,7 @@ class MapRouteExplorer extends PuzzleSolver {
                 res4 <- futures(3)
         yield
                 res1 ++ res2 ++ res3 ++ res4
-        while futures.exists(!_.isCompleted) do { Thread.sleep(100); print(".") }
+        while futures.exists(!_.isCompleted) do { Thread.sleep(10); print(".") }
         result.onComplete {
             case Success(x) =>
                 println()
