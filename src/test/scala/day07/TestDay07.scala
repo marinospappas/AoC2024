@@ -23,5 +23,8 @@ class TestDay07 extends AnyFlatSpec {
     }
 
     it should "solve part2 correctly" in {
+        val result = solver.part2
+        println(result)
+        result shouldBe 11387
     }
 }
