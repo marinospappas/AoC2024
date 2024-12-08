@@ -25,9 +25,16 @@ class AntennaPositionAnalyser extends PuzzleSolver {
         if part1 then findFirstAntinodes(pair) else findAllAntinodes(pair)
 
     def findAntinodes(part1: Boolean): Set[(Int, Int)] =
-        antennas.map(_._2.toList.combinations(2))           // List of Antennas / List of Positions / Combinations of 2
-            .flatMap(_.map( toAntinodes(_, part1)))         // List of Antennas / List of Antinodes positions
-            .flatten.toSet                                  // Set of Unique Antinodes positions
+        (for {
+            position <- antennas.values
+            a1 <- position
+            a2 <- position
+            if a1 != a2
+            antiNode <- toAntinodes(List(a1, a2), part1)
+        } yield antiNode).toSet
+//        antennas.map( _._2.toList.combinations(2) )           // List of Antennas / List of Positions / Combinations of 2
+//            .flatMap( _.map( toAntinodes(_, part1)) )         // List of Antennas / List of Antinodes positions
+//            .flatten.toSet                                    // Set of Unique Antinodes positions
 
     override def part1: Any =
         findAntinodes(part1 = true).size
