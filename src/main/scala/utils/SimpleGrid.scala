@@ -13,22 +13,30 @@ open class SimpleGrid(gridData: List[String]) {
         if isInsideGrid(p) then data(p._2)(p._1) else null
     
     def setDataPoint(p: (Int, Int), d: Char): Unit = data(p._2)(p._1) = d
-    
+
     def getDataPoints: Array[Array[Char]] = data
-    
+
     def getDataValues: Set[Char] = data.flatten.toSet
-        
+
     def getAdjacent(p: Point, includeDiagonals: Boolean = false): Set[Point] =
         (if (includeDiagonals) p.adjacent() else p.adjacentCardinal()).toSet
     
     def findFirst(d: Char): (Int, Int) = {
-        val index = data.map(_.toList).toList.flatten.indexOf(d)
-        if index < 0 then (-1, -1)
-        else indexToXY(index)
+        var seq = IndexedSeq[(Int, Int)]()
+        if { seq = for {
+                y <- 0 to maxY
+                x <- 0 to maxX
+                if data(y)(x) == d
+            } yield (x, y)
+            seq.nonEmpty } then seq(0) else (-1, -1)
     }
 
     def findAll(d: Char): Set[(Int, Int)] =
-        data.flatten.zipWithIndex.filter( _._1 == d ).map( _._2 ).map( indexToXY ).toSet
+        (for {
+            y <- 0 to maxY
+            x <- 0 to maxX
+            if data(y)(x) == d
+        } yield (x, y)).toSet
 
     def getColumn(x: Int): List[Char] = (0 to maxY).map( data(x)(_)).toList
 
@@ -46,23 +54,9 @@ open class SimpleGrid(gridData: List[String]) {
 
     def printIt(): Unit = {
         for (i <- data.indices)
-            print(f"${i % 100}%2d ")
-            for (j <- data.head.indices)
-                print(data(i)(j))
-            println("")
-        print("   ")
-        for (i <- data.head.indices)
-            print(if (i % 10 == 0) (i / 10) % 10 else " ")
-        println("")
-        print("   ")
-        for (i <- data.head.indices)
-            print(i % 10)
-        println("")
-    }
-
-    private def indexToXY(i: Int): (Int, Int) = {
-        val y = i / (maxY + 1)
-        (i - y * (maxX + 1), y)
+            (f"${i % 100}%2d " + data(i).mkString).printLn()
+        ("   " + data.head.indices.map( x => if x % 10 == 0 then ((x / 10) % 10).toString else " " ).mkString).printLn()
+        ("   " + data.head.indices.map( x => (x % 10).toString ).mkString).printLn()
     }
 }
 
