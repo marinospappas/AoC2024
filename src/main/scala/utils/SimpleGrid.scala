@@ -1,23 +1,24 @@
 package org.mpdev.scala.aoc2024
 package utils
 
+import scala.collection.mutable
 import scala.reflect.ClassTag
 
-open class SimpleGrid[T:ClassTag](gridData: List[String], mapper: Map[Char,T] = SimpleGrid.allCharsDefMapper) {
+open class SimpleGrid(gridData: List[String]) {
 
-    private val data: Array[Array[T]] = gridData.toArray.map (s => s.toCharArray.map (c => mapper(c)))
+    private val data: Array[Array[Char]] = gridData.toArray.map (s => s.toCharArray)
     private val maxX: Int = data(0).length - 1
     private val maxY: Int = data.length - 1
     
-    def getDataPoint(p: (Int, Int)): T | Null = 
+    def getDataPoint(p: (Int, Int)): Char | Null = 
         if isInsideGrid(p) then data(p._2)(p._1) else null
     
-    def setDataPoint(p: (Int, Int), t: T): Unit = data(p._2)(p._1) = t
+    def setDataPoint(p: (Int, Int), d: Char): Unit = data(p._2)(p._1) = d
     
     def getAdjacent(p: Point, includeDiagonals: Boolean = false): Set[Point] =
         (if (includeDiagonals) p.adjacent() else p.adjacentCardinal()).toSet
     
-    def findFirst(d: T): (Int, Int) = {
+    def findFirst(d: Char): (Int, Int) = {
         val index = data.map(_.toList).toList.flatten.indexOf(d)
         if index < 0 then (-1, -1)
         else {
@@ -26,13 +27,21 @@ open class SimpleGrid[T:ClassTag](gridData: List[String], mapper: Map[Char,T] = 
         }
     }
     
-    def getColumn(x: Int): List[T] = (0 to maxY).map( data(x)(_)).toList
+    def findAll(d: Char): Set[(Int, Int)] = {
+        val result = mutable.Set[(Int, Int)]()
+        for i <- data.indices do
+            for j <- data.head.indices do 
+                if data(j)(i) == d then result += ((i, j))
+        result.toSet
+    }
+        
+    def getColumn(x: Int): List[Char] = (0 to maxY).map( data(x)(_)).toList
 
-    def getRow(y: Int): List[T] = data(y).toList
+    def getRow(y: Int): List[Char] = data(y).toList
 
     def getDimensions: (Int, Int) = (maxX+1, maxY+1)
 
-    def countOf(item: T): Int = data.map(_.toList).toList.flatten.count( _ == item )
+    def countOf(item: Char): Int = data.map(_.toList).toList.flatten.count( _ == item )
     
     def nextPoint(p: (Int, Int)): (Int, Int) = 
         if (p._1 < maxX) (p._1 + 1, p._2)
@@ -40,17 +49,11 @@ open class SimpleGrid[T:ClassTag](gridData: List[String], mapper: Map[Char,T] = 
 
     def isInsideGrid(p: (Int, Int)): Boolean = 0 <= p._1 && p._1 <= maxX && 0 <= p._2 && p._2 <= maxY
 
-    private def map2Char(t: T) = {
-        mapper.map(_.swap).getOrElse(t, t match
-            case i: Int => ('0'.toInt + i % 10).toChar
-            case _ => 'x')
-    }
-
     def printIt(): Unit = {
         for (i <- data.indices)
             print(f"${i % 100}%2d ")
             for (j <- data.head.indices)
-                print(map2Char(data(i)(j)))
+                print(data(i)(j))
             println("")
         print("   ")
         for (i <- data.head.indices)

@@ -16,14 +16,14 @@ import scala.util.{Failure, Success}
 
 class MapRouteExplorer extends PuzzleSolver {
 
-    val mapGrid: SimpleGrid[Char] = SimpleGrid(InputReader.read(6))
+    val mapGrid: SimpleGrid = SimpleGrid(InputReader.read(6))
     val (guard, obstacle, obstruction, empty, trace) = ('S', '#', 'O', '.', 'X')
     val startPosition: (Int, Int) = mapGrid.findFirst(guard)
     private val direction = N
     private val NUM_THREADS = 4
 
     // returns false if loop detected
-    private def walkMap(grid: SimpleGrid[Char], start: (Int, Int, Direction),
+    private def walkMap(grid: SimpleGrid, start: (Int, Int, Direction),
                         route: ArrayBuffer[(Int, Int, Direction)], obstaclePoint: (Int, Int) = (-1,-1)): Boolean = {
         var (curX, curY, facing) = start
         // a temporary map is used to build the route so that the lookup for previous points in the route can be done fast (as key lookup)        
