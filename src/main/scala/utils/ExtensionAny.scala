@@ -5,3 +5,7 @@ extension (a: Any)
 
     def printLn(): Unit =
         println(a)
+
+    def also( f: Any => Unit ): Any =
+        f(a)
+        a

@@ -32,10 +32,6 @@ class AntennaPositionAnalyser extends PuzzleSolver {
             if a1 != a2
             antiNode <- toAntinodes(List(a1, a2), part1)
         } yield antiNode).toSet
-// alternatively can be done with combinations
-//        antennas.map( _._2.toList.combinations(2) )           // List of Antennas / List of Positions / Combinations of 2
-//            .flatMap( _.map( toAntinodes(_, part1)) )         // List of Antennas / List of Antinodes positions
-//            .flatten.toSet                                    // Set of Unique Antinodes positions
 
     override def part1: Any =
         findAntinodes(part1 = true).size

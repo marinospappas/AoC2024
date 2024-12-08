@@ -1,6 +1,7 @@
 package org.mpdev.scala.aoc2024
 package utils
 
+import utils.Grid.*
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -8,14 +9,14 @@ open class Grid[T](gridData: Map[Point,T],
                    mapper: Map[Char,T] = Grid.allCharsDefMapper,
                    borderWidth: Int = 0,
                    defaultChar: Char = '.',
-                   defaultSize: (Int, Int) = (-1,-1)) {
+                   defaultSize: (Int, Int) = (-1,-1),
+                   printFormat: String = DEFAULT_FORMAT) {
 
     private val data: mutable.Map[Point, T] = mutable.Map[Point, T]()
     private var maxX: Int = 0
     private var maxY: Int = 0
     private var minX: Int = 0
     private var minY: Int = 0
-    private var DEFAULT_CHAR = '.'
     private var cornerPoints: Set[Point] = Set()
     private var border: List[Point] = List()
 
@@ -131,9 +132,9 @@ open class Grid[T](gridData: Map[Point,T],
     }
 
 
-    private def data2Grid(): Array[Array[Char]] =
-        val grid: Array[Array[Char]] = Array.fill(maxY-minY+1) { Array.fill(maxX-minX+1) { DEFAULT_CHAR } }
-        for ( (pos, item) <- data) do grid(pos.y - minY)(pos.x - minX) = map2Char(item)
+    private def data2Grid(): Array[Array[String]] =
+        val grid: Array[Array[String]] = Array.fill(maxY-minY+1) { Array.fill(maxX-minX+1) { DEFAULT_CHAR.toString } }
+        for ( (pos, item) <- data) do grid(pos.y - minY)(pos.x - minX) = printFormat.format(map2Char(item))
         grid
 
     private def map2Char(t: T) =
@@ -143,7 +144,7 @@ open class Grid[T](gridData: Map[Point,T],
 
     def printIt(): Unit = printGrid(data2Grid())
 
-    private def printGrid(grid: Array[Array[Char]]): Unit =
+    private def printGrid(grid: Array[Array[String]]): Unit =
         for (i <- grid.indices)
             print(f"${i%100}%2d ")
             for (j <- grid.head.indices)
@@ -155,12 +156,14 @@ open class Grid[T](gridData: Map[Point,T],
         println("")
         print("   ")
         for (i <- grid.head.indices)
-            print(i%10)
+            print(printFormat.format((i%10).toString.head))
         println("")
 
 }
 
 object Grid {
+    val DEFAULT_FORMAT = "%c"
+    var DEFAULT_CHAR = '.'
     val allCharsDefMapper: Map[Char, Char] = (' ' to '~').map(c => c -> c).toMap
     val bitToInt: Array[Int] = Array(1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
         65536, 131072, 262144, 524288, 1_048_576, 2_097_152, 4_194_304, 8_388_608,

@@ -1,29 +1,30 @@
 package org.mpdev.scala.aoc2024
-package day07
+package day09
 
 import framework.AocMain
-import solutions.day07.BridgeRepair
-import utils.also
+import solutions.day09.Day09Solver
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
 
-class TestDay07 extends AnyFlatSpec {
+class TestDay09 extends AnyFlatSpec {
 
     AocMain.environment = "test"
-    private val solver = BridgeRepair()
+    private val solver = Day09Solver()
 
     it should "read input and setup list" in {
-        solver.inputData.foreach((n, l) => println(s"$n: ${l.mkString(",")}"))
+        solver.inputData.foreach(println)
         solver.inputData.size shouldBe 9
     }
 
     it should "solve part1 correctly" in {
-        val result = solver.part1.also(println)
+        val result = solver.part1
+        println(result)
         result shouldBe 3749
     }
 
     it should "solve part2 correctly" in {
-        val result = solver.part2.also(println)
+        val result = solver.part2
+        println(result)
         result shouldBe 11387
     }
 }

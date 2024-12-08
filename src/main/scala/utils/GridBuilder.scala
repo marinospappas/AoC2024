@@ -9,7 +9,8 @@ case class GridBuilder[T](gridData: Map[Point,T] = Map(),
                           mapper: Map[Char,T] = Map(),
                           border: Int = 0,
                           defaultChar: Char = '.',
-                          defaultSize: (Int, Int) = (-1,-1)) {
+                          defaultSize: (Int, Int) = (-1,-1),
+                          printFormat: String = Grid.DEFAULT_FORMAT) {
 
     def withGridData(gridData: Map[Point,T]): GridBuilder[T] = copy(gridData = gridData)
 
@@ -42,8 +43,10 @@ case class GridBuilder[T](gridData: Map[Point,T] = Map(),
     def withDefaultChar(defaultChar: Char): GridBuilder[T] = copy(defaultChar = defaultChar)
 
     def withDefaultSize(defaultSize: (Int, Int)): GridBuilder[T] = copy(defaultSize = defaultSize)
+    
+    def withPrintFormat(printFormat: String): GridBuilder[T] = copy(printFormat = printFormat)
 
-    def build(): Grid[T] = Grid[T](gridData, mapper, border, defaultChar, defaultSize)
+    def build(): Grid[T] = Grid[T](gridData, mapper, border, defaultChar, defaultSize, printFormat)
 
     // conversion of input data to Map[Point,T]
     private def processInputVisual(input: List[String], mapper: Map[Char, T]): Map[Point, T] =

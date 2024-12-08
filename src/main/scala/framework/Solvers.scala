@@ -9,8 +9,9 @@ import solutions.day05.PrintingRules
 import solutions.day06.MapRouteExplorer
 import solutions.day07.BridgeRepair
 import solutions.day08.AntennaPositionAnalyser
+import solutions.day09.Day09Solver
 
 val solvers = Map(
     1 -> LocationAnalyser(), 2 -> ReportAnalyser(), 3 -> CorruptedMemoryCleaner(), 4 -> WordSearch(), 5 -> PrintingRules(),
-    6 -> MapRouteExplorer(), 7 -> BridgeRepair(), 8 -> AntennaPositionAnalyser()
+    6 -> MapRouteExplorer(), 7 -> BridgeRepair(), 8 -> AntennaPositionAnalyser(), 9 -> Day09Solver()
 )
