@@ -1,7 +1,6 @@
 package org.mpdev.scala.aoc2024
 package utils
 
-import scala.collection.mutable
 import scala.reflect.ClassTag
 
 open class SimpleGrid(gridData: List[String]) {
@@ -10,31 +9,27 @@ open class SimpleGrid(gridData: List[String]) {
     private val maxX: Int = data(0).length - 1
     private val maxY: Int = data.length - 1
     
-    def getDataPoint(p: (Int, Int)): Char | Null = 
+    def getDataPoint(p: (Int, Int)): Char | Null =
         if isInsideGrid(p) then data(p._2)(p._1) else null
     
     def setDataPoint(p: (Int, Int), d: Char): Unit = data(p._2)(p._1) = d
     
+    def getDataPoints: Array[Array[Char]] = data
+    
+    def getDataValues: Set[Char] = data.flatten.toSet
+        
     def getAdjacent(p: Point, includeDiagonals: Boolean = false): Set[Point] =
         (if (includeDiagonals) p.adjacent() else p.adjacentCardinal()).toSet
     
     def findFirst(d: Char): (Int, Int) = {
         val index = data.map(_.toList).toList.flatten.indexOf(d)
         if index < 0 then (-1, -1)
-        else {
-            val y = index / (maxY + 1)
-            (index - y * (maxX + 1), y)
-        }
+        else indexToXY(index)
     }
-    
-    def findAll(d: Char): Set[(Int, Int)] = {
-        val result = mutable.Set[(Int, Int)]()
-        for i <- data.indices do
-            for j <- data.head.indices do 
-                if data(j)(i) == d then result += ((i, j))
-        result.toSet
-    }
-        
+
+    def findAll(d: Char): Set[(Int, Int)] =
+        data.flatten.zipWithIndex.filter( _._1 == d ).map( _._2 ).map( indexToXY ).toSet
+
     def getColumn(x: Int): List[Char] = (0 to maxY).map( data(x)(_)).toList
 
     def getRow(y: Int): List[Char] = data(y).toList
@@ -63,6 +58,11 @@ open class SimpleGrid(gridData: List[String]) {
         for (i <- data.head.indices)
             print(i % 10)
         println("")
+    }
+
+    private def indexToXY(i: Int): (Int, Int) = {
+        val y = i / (maxY + 1)
+        (i - y * (maxX + 1), y)
     }
 }
 
