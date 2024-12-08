@@ -22,13 +22,8 @@ open class SimpleGrid(gridData: List[String]) {
         (if (includeDiagonals) p.adjacent() else p.adjacentCardinal()).toSet
     
     def findFirst(d: Char): (Int, Int) = {
-        var seq = IndexedSeq[(Int, Int)]()
-        if { seq = for {
-                y <- 0 to maxY
-                x <- 0 to maxX
-                if data(y)(x) == d
-            } yield (x, y)
-            seq.nonEmpty } then seq(0) else (-1, -1)
+        val y = (0 to maxY).find( data(_).contains(d) ).getOrElse(-1)
+        if y >= 0 then (data(y).indexOf(d), y) else (-1, -1)
     }
 
     def findAll(d: Char): Set[(Int, Int)] =
@@ -53,7 +48,7 @@ open class SimpleGrid(gridData: List[String]) {
     def isInsideGrid(p: (Int, Int)): Boolean = 0 <= p._1 && p._1 <= maxX && 0 <= p._2 && p._2 <= maxY
 
     def printIt(): Unit = {
-        for (i <- data.indices)
+        for i <- data.indices do
             (f"${i % 100}%2d " + data(i).mkString).printLn()
         ("   " + data.head.indices.map( x => if x % 10 == 0 then ((x / 10) % 10).toString else " " ).mkString).printLn()
         ("   " + data.head.indices.map( x => (x % 10).toString ).mkString).printLn()
@@ -105,10 +100,7 @@ object SimpleGrid {
 
     object Direction {
         def allCardinal: Set[Direction] = Set(N, E, S, W)
-
         def allDirections: Set[Direction] = allCardinal ++ Set(NE, SE, SW, NW)
-        
-        
     }
 }
 
