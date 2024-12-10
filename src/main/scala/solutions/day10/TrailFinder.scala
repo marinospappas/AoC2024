@@ -15,8 +15,7 @@ class TrailFinder(var testData: List[String] = List()) extends PuzzleSolver {
     override def part1: Any = {
         val paths = startPoints.map(p => (p._1, p._2, TRAIL_START))
             .flatMap(start => bfs.allPaths(start, node => node._3 == TRAIL_END))
-            .map( p => (p.head, p.last) )
-            .toList.sortBy(_._1)
+            .map( p => (p.head, p.last) ).toList.sortBy(_._1)
         if AocMain.environment != "prod" then paths.foreach(println)
         paths.size
     }
@@ -24,7 +23,7 @@ class TrailFinder(var testData: List[String] = List()) extends PuzzleSolver {
     override def part2: Any = {
         val paths = startPoints.map(p => (p._1, p._2, TRAIL_START))
             .flatMap(start => bfs.allPaths(start, node => node._3 == TRAIL_END))
-            .toList.map( p => (p.head, p.last) )
+            .toList.map( p => (p.head, p.last) ).sortBy(_._1)
         if AocMain.environment != "prod" then paths.foreach(println)
         paths.size
     }
