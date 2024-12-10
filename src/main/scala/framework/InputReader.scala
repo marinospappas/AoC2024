@@ -12,7 +12,7 @@ object InputReader {
         case "none" => ""
 
     def read(day: Int, pattern: String = filePattern, extension: String = "txt"): List[String] = {
-        if (filePattern.isEmpty)
+        if (pattern.isEmpty)
             return List()
         val name =  f"$pattern$day%02d.$extension"
         val source = fromFile(name)

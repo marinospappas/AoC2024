@@ -8,8 +8,10 @@ open class SimpleGrid(gridData: List[String]) {
     private val data: Array[Array[Char]] = gridData.toArray.map (s => s.toCharArray)
     private val maxX: Int = data(0).length - 1
     private val maxY: Int = data.length - 1
-    
-    def getDataPoint(p: (Int, Int)): Char | Null =
+
+    def getDataPoint(p: (Int, Int)): Char = data(p._2)(p._1)
+        
+    def getDataPointOrNull(p: (Int, Int)): Char | Null =
         if isInsideGrid(p) then data(p._2)(p._1) else null
     
     def setDataPoint(p: (Int, Int), d: Char): Unit = data(p._2)(p._1) = d
@@ -18,9 +20,16 @@ open class SimpleGrid(gridData: List[String]) {
 
     def getDataValues: Set[Char] = data.flatten.toSet
 
+    // TODO: tidy this up to take (Int, Int) as input
     def getAdjacent(p: Point, includeDiagonals: Boolean = false): Set[Point] =
         (if (includeDiagonals) p.adjacent() else p.adjacentCardinal()).toSet
-    
+
+    def getAdjacentValues(p: (Int, Int), includeDiagonals: Boolean = false): List[Char] = {
+        val point = Point(p._1, p._2)
+        (if (includeDiagonals) point.adjacent() else point.adjacentCardinal())
+            .map( pos => data(pos.y)(pos.x) ).toList
+    }
+
     def findFirst(d: Char): (Int, Int) = {
         val y = (0 to maxY).find( data(_).contains(d) ).getOrElse(-1)
         if y >= 0 then (data(y).indexOf(d), y) else (-1, -1)
@@ -47,6 +56,9 @@ open class SimpleGrid(gridData: List[String]) {
 
     def isInsideGrid(p: (Int, Int)): Boolean = 0 <= p._1 && p._1 <= maxX && 0 <= p._2 && p._2 <= maxY
 
+    // TODO: need also indexToPos
+    def posToIndex(pos: (Int, Int)): Int = pos._2 * maxY + pos._1
+    
     def printIt(): Unit = {
         for i <- data.indices do
             (f"${i % 100}%2d " + data(i).mkString).printLn()
@@ -100,6 +112,7 @@ object SimpleGrid {
 
     object Direction {
         def allCardinal: Set[Direction] = Set(N, E, S, W)
+
         def allDirections: Set[Direction] = allCardinal ++ Set(NE, SE, SW, NW)
     }
 }

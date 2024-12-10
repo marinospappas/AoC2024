@@ -18,9 +18,6 @@ class DiskFragmenter extends PuzzleSolver {
         freeSpace.indices.flatMap( i =>
             List.fill(freeSpace(i))(-1) ++ List.fill(filesSize(i + 1))((i + 1).toChar)
         )
-    println(s"total free space: ${freeSpace.sum}")
-    println(s"zero size files: ${inputData.indices.filter(_ % 2 == 0).map( inputData(_) ).filter(_ == 0).toList}")
-    println(s"zero size gaps: ${inputData.indices.filter(_ % 2 == 1).map( inputData(_) ).count(_ == 0)}")
 
     var timeBuildingFreeAndFilesMap = 0L
     var timeLookingUpFreeBlocks = 0L
@@ -43,27 +40,27 @@ class DiskFragmenter extends PuzzleSolver {
         blocks.toList
     }
 
-//    def getFirstFreeBlock(freeMap: Map[Int, List[Int]], size: Int): (Int, Int, Int) = {
-//        boundary:
-//            for i <- size to 9 do {
-//                if freeMap.contains(i) && freeMap(i).exists(_ > 0) then
-//                    break((freeMap(i).head, i, 0))
-//            }
-//            (-1, -1, 0)
-//    }
-//
-//    def adjustFreeMap(freeMap: Map[Int, List[Int]], key: Int, fileSize: Int): Map[Int, List[Int]] = {
-//        val newFreeMap = freeMap.to(mutable.Map)
-//        val freeBlocksList = newFreeMap(key)
-//        val updatedBlocksList = freeBlocksList.slice(1, freeBlocksList.size)
-//        val firstFreeBlock = newFreeMap(key).head
-//        if updatedBlocksList.isEmpty then newFreeMap.remove(key)
-//        else newFreeMap.put(key, freeBlocksList.slice(1, freeBlocksList.size))
-//        if key > fileSize then     // free space was > file size
-//            newFreeMap.put(key - fileSize,
-//                (freeMap.getOrElse(key - fileSize, List()) :+ (firstFreeBlock + fileSize)).sorted )
-//        newFreeMap.toMap
-//    }
+    def getFirstFreeBlock(freeMap: Map[Int, List[Int]], size: Int): (Int, Int, Int) = {
+        boundary:
+            for i <- size to 9 do {
+                if freeMap.contains(i) && freeMap(i).exists(_ > 0) then
+                    break((freeMap(i).head, i, 0))
+            }
+            (-1, -1, 0)
+    }
+
+    def adjustFreeMap(freeMap: Map[Int, List[Int]], key: Int, fileSize: Int): Map[Int, List[Int]] = {
+        val newFreeMap = freeMap.to(mutable.Map)
+        val freeBlocksList = newFreeMap(key)
+        val updatedBlocksList = freeBlocksList.slice(1, freeBlocksList.size)
+        val firstFreeBlock = newFreeMap(key).head
+        if updatedBlocksList.isEmpty then newFreeMap.remove(key)
+        else newFreeMap.put(key, freeBlocksList.slice(1, freeBlocksList.size))
+        if key > fileSize then     // free space was > file size
+            newFreeMap.put(key - fileSize,
+                (freeMap.getOrElse(key - fileSize, List()) :+ (firstFreeBlock + fileSize)).sorted )
+        newFreeMap.toMap
+    }
 
     def getFirstFreeBlock(freeList: List[(Int, Int)], size: Int): (Int, Int, Int) = {
         boundary:
@@ -91,6 +88,7 @@ class DiskFragmenter extends PuzzleSolver {
         }
     }
 
+    // TODO: fix bug caused by the introduction of the map of free blocks - affects part 2
     def defragmentDisk2: List[Int] = {
         val blocks = diskBlocks.to(ArrayBuffer)
         val (filesBlocks, freeBlocks, freeBlocksList) = findFilesAndFreeBlocksIndexesAndSizes(blocks.toList)
@@ -101,16 +99,16 @@ class DiskFragmenter extends PuzzleSolver {
             val (fileStart, fileSize) = filesBlocks(curFileIndx)
             // find first free block that fits the file
             val start = System.nanoTime()
-            // val (firstFreeBlock, firstFreeBlockSize, ignore) = getFirstFreeBlock(freeMap, fileSize)
-            val (firstFreeBlock, firstFreeBlockSize, freeListKey) = getFirstFreeBlock(freeList, fileSize)
+            val (firstFreeBlock, firstFreeBlockSize, ignore) = getFirstFreeBlock(freeMap, fileSize)
+            // val (firstFreeBlock, firstFreeBlockSize, freeListKey) = getFirstFreeBlock(freeList, fileSize)
             timeLookingUpFreeBlocks += (System.nanoTime() - start)
             if firstFreeBlockSize >= 0 then {
                 // if such a block exists move the file
                 moveFile(blocks, fileStart, firstFreeBlock, fileSize)
                 timeMovingFiles += (System.nanoTime() - start)
                 // and adjust the free map
-                //freeMap = adjustFreeMap(freeMap, firstFreeBlockSize, fileSize)
-                freeList = adjustFreeList(freeList, freeListKey, fileSize)
+                freeMap = adjustFreeMap(freeMap, firstFreeBlockSize, fileSize)
+                // freeList = adjustFreeList(freeList, freeListKey, fileSize)
             }
             curFileIndx -= 1
             curFileIndx >= 0
@@ -120,17 +118,18 @@ class DiskFragmenter extends PuzzleSolver {
 
     def findFilesAndFreeBlocksIndexesAndSizes(diskBlocks: List[Int]): (List[(Int, Int)], Map[Int, List[Int]], List[(Int, Int)]) = {     // start index, size
         val start = System.nanoTime()
-        val files = ArrayBuffer[(Int, Int)]()       // position of block, size
+        val files = ArrayBuffer[(Int, Int)]((0, filesSize.head))       // position of block, size
         val freeList = ArrayBuffer[(Int, Int)]()
         val freeMap = mutable.Map[Int, List[Int]]()     // size of free block -> list of positions in the disk
-        var curIndex = 0
-        for i <- inputData.indices do {
-            if i % 2 == 0 then files += ((curIndex, inputData(i)))
-            else  if inputData(i) > 0 then {
-                freeMap.put(inputData(i), freeMap.getOrElse(inputData(i), List()) :+ curIndex)
-                freeList += ((curIndex, inputData(i)))
+        var curIndex = filesSize.head
+        for i <- freeSpace.indices do {
+            if freeSpace(i) > 0 then {
+                freeMap.put(freeSpace(i), freeMap.getOrElse(freeSpace(i), List()) :+ curIndex)
+                freeList += ((curIndex, freeSpace(i)))
             }
-            curIndex += inputData(i)
+            curIndex += freeSpace(i)
+            files += ((curIndex, filesSize(i + 1)))
+            curIndex += filesSize(i + 1)
         }
         timeBuildingFreeAndFilesMap = System.nanoTime() - start
         (files.toList, freeMap.toMap, freeList.toList)

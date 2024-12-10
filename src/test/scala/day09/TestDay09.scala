@@ -9,7 +9,7 @@ import org.scalatest.matchers.should.Matchers.*
 
 class TestDay09 extends AnyFlatSpec {
 
-    AocMain.environment = "prod"
+    AocMain.environment = "test"
     private val solver = DiskFragmenter()
 
     it should "read input and setup list" in {

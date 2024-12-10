@@ -30,11 +30,11 @@ class MapRouteExplorer extends PuzzleSolver {
         val thisRoute = mutable.Map[(Int, Int, SimpleGrid.Direction), Int]()
         var routeIndex = 0
         boundary:
-            while grid.getDataPoint((curX, curY)) != null do {
+            while grid.getDataPointOrNull((curX, curY)) != null do {
                 if thisRoute.contains((curX, curY, facing)) then
                     break(false) // loop detected
                 var nextPosition = (curX + facing.incr._1, curY + facing.incr._2)
-                while  grid.getDataPoint(nextPosition) == obstacle || nextPosition == obstaclePoint do {
+                while  grid.getDataPointOrNull(nextPosition) == obstacle || nextPosition == obstaclePoint do {
                     facing = facing.turnRight
                     nextPosition = (curX + facing.incr._1, curY + facing.incr._2)
                 }
