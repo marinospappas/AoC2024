@@ -2,66 +2,26 @@ package org.mpdev.scala.aoc2024
 package solutions.day09
 
 import framework.{InputReader, PuzzleSolver}
-import solutions.day09.DiskFragmenter.*
-import solutions.day09.DiskFragmenter.DiskBlock.*
+import solutions.day09.DiskFragmenter_.*
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.boundary
 import scala.util.boundary.break
 
-class DiskFragmenter extends PuzzleSolver {
+class DiskFragmenter_ extends PuzzleSolver {
 
     val inputData: List[Int] = InputReader.read(9).head.map( _.toInt - '0' ).toList
     val filesSize: List[Int] = inputData.indices.filter(_ % 2 == 0).map( inputData(_) ).toList
     val freeSpace: List[Int] = inputData.indices.filter(_ % 2 == 1).map( inputData(_) ).toList
     val diskBlocks: List[Int] = List.fill(filesSize.head)(0) ++
         freeSpace.indices.flatMap( i =>
-            List.fill(freeSpace(i))(-1) ++ List.fill(filesSize(i + 1))(((i + 1) % 10).toChar)
+            List.fill(freeSpace(i))(-1) ++ List.fill(filesSize(i + 1))((i + 1).toChar)
         )
 
     var timeBuildingFreeAndFilesMap = 0L
     var timeLookingUpFreeBlocks = 0L
     var timeMovingFiles = 0L
-
-    val disk: ArrayBuffer[DiskBlock] = ArrayBuffer(DiskBlock.File(0, filesSize.head)) ++
-        freeSpace.indices.flatMap(i =>
-            ArrayBuffer(Free(freeSpace(i))) ++ ArrayBuffer(File( ((i + 1) % 10).toChar, filesSize(i + 1)))
-        )
-
-    private def findNextFreeBlock(disk: ArrayBuffer[DiskBlock], fileSize: Int): (Int, Int) =
-        var size = -1
-        (disk.indexWhere ( {
-            case File(_, _) => false
-            case Free(freeSize) => size = freeSize
-                freeSize >= fileSize
-        } ), size)
-
-    def defragmentFileSystem: ArrayBuffer[DiskBlock] = {
-        val newDisk = ArrayBuffer.from(disk)
-        var (fileIndexInDisk, fileId, fileSize) = (0, 0, 0)
-        while { fileIndexInDisk = disk.lastIndexWhere {
-                case File(id, size) =>
-                    fileId = id
-                    fileSize = size
-                    true
-                case Free(_) => false
-            }
-            fileIndexInDisk >= 0
-        }
-        do {
-            val file = newDisk(fileIndexInDisk)
-            val (nextFreeIndexOnDisk, freeBlockSize) = findNextFreeBlock(newDisk, fileSize)
-            if nextFreeIndexOnDisk > 0 then {
-                if freeBlockSize == fileSize then newDisk(nextFreeIndexOnDisk) = newDisk(fileIndexInDisk)
-                else {
-                    newDisk(nextFreeIndexOnDisk) = Free(freeBlockSize - fileSize)
-                    newDisk.insert(nextFreeIndexOnDisk, newDisk(fileIndexInDisk))
-                }
-            }
-        }
-        newDisk
-    }
 
     def defragmentDisk: List[Int] = {
         val blocks = diskBlocks.to(ArrayBuffer)
@@ -198,11 +158,6 @@ class DiskFragmenter extends PuzzleSolver {
         s.split(",").map(a => a.toInt).toList
 }
 
-object DiskFragmenter {
+object DiskFragmenter_ {
     val FREE = -1
-
-    enum DiskBlock {
-        case File(id: Int, size: Int)
-        case Free(size: Int)
-    }
 }

@@ -38,8 +38,10 @@ object TrailFinder {
     private def initGraph(grid: SimpleGrid): Graph[(Int, Int, Char)] = {
         val graph = Graph[(Int, Int, Char)]()
         val (xSize, ySize) = grid.getDimensions
-        for x <- 0 until xSize do
-            for y <- 0 until ySize do {
+        (for {
+            x <- 0 until xSize
+            y <- 0 until ySize
+        } yield (x, y)).foreach( (x, y) =>
                 val datum = grid.getDataPoint((x, y))
                 val node = (x, y, datum)
                 if TRAIL.contains(datum) then {
@@ -51,7 +53,7 @@ object TrailFinder {
                     graph.addNodes(node, neighbours)
                     neighbours.foreach(n => graph.addNode(n))
                 }
-            }
+        )
         graph
     }
 }

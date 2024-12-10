@@ -16,6 +16,7 @@ class TestDay09 extends AnyFlatSpec {
         println(solver.filesSize)
         println(solver.freeSpace)
         println(solver.diskBlocks)
+        println(solver.disk)
         (solver.filesSize.size, solver.freeSpace.size,
             solver.diskBlocks.map(i => if i == -1 then "." else i.toString).mkString) shouldBe
             (10, 9, "00...111...2...333.44.5555.6666.777.888899")
@@ -43,6 +44,7 @@ class TestDay09 extends AnyFlatSpec {
         println(files.size)
         println(freeMap.size)
         println(freeList.size)
+        solver.defragmentFileSystem.also(println)
     }
 
     it should "defragment the disk - move whole files" in {
