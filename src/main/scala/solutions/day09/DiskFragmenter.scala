@@ -12,21 +12,16 @@ import scala.util.boundary.break
 
 class DiskFragmenter extends PuzzleSolver {
 
-    val inputData: List[Int] = InputReader.read(9).head.map( _.toInt - '0' ).toList
-    val filesSize: List[Int] = inputData.indices.filter(_ % 2 == 0).map( inputData(_) ).toList
-    val freeSpace: List[Int] = inputData.indices.filter(_ % 2 == 1).map( inputData(_) ).toList
-    val diskBlocks: List[Int] = List.fill(filesSize.head)(0) ++
-        freeSpace.indices.flatMap( i =>
-            List.fill(freeSpace(i))(-1) ++ List.fill(filesSize(i + 1))(i + 1)
-        )
-
-    val disk: List[DiskBlock] = List(DiskBlock.File(0, filesSize.head, true)) ++
+    val inputData: Vector[Int] = InputReader.read(9).head.map( _.toInt - '0' ).toVector
+    val filesSize: Vector[Int] = inputData.indices.filter(_ % 2 == 0).map( inputData(_) ).toVector
+    val freeSpace: Vector[Int] = inputData.indices.filter(_ % 2 == 1).map( inputData(_) ).toVector
+    val fileSystem: Vector[DiskBlock] = Vector(DiskBlock.File(0, filesSize.head, true)) ++
         freeSpace.indices.flatMap(i =>
-            List(Free(freeSpace(i))) ++ List(File( i + 1, filesSize(i + 1), false))
+            Vector(Free(freeSpace(i))) ++ Vector(File( i + 1, filesSize(i + 1), false))
         )
 
-    def defragmentDisk: List[Int] = {
-        val blocks = diskBlocks.to(ArrayBuffer)
+    def defragmentDisk: Vector[Int] = {
+        val blocks = fileSystemToBlocks(fileSystem).to(ArrayBuffer)
         var (nextFile, nextFree) = (blocks.lastIndexWhere(_ >= 0), blocks.indexWhere(_ < 0))
         while nextFile > nextFree do {
             blocks(nextFree) = blocks(nextFile)
@@ -34,9 +29,9 @@ class DiskFragmenter extends PuzzleSolver {
             nextFree = blocks.indexWhere(_ < 0, nextFree)
             nextFile = blocks.lastIndexWhere(_ >= 0, nextFile)
         }
-        blocks.toList
+        blocks.toVector
     }
-    
+
     private def findNextFreeBlock(disk: ArrayBuffer[DiskBlock], fileSize: Int, fileIndex: Int): (Int, Int) =
         var (indx, size) = (-1, -1)
         ( if { indx = disk.indexWhere ( {
@@ -47,13 +42,12 @@ class DiskFragmenter extends PuzzleSolver {
             indx < fileIndex
         } then indx else -1, size)
 
-    def defragmentFileSystem: List[DiskBlock] = {
-        val newDisk = ArrayBuffer.from(disk)
+    def defragmentFileSystem: Vector[DiskBlock] = {
+        val newDisk = ArrayBuffer.from(fileSystem)
         var (fileIndexInDisk, fileId, fileSize) = (0, 0, 0)
         while { fileIndexInDisk = newDisk.lastIndexWhere {
                 case File(id, size, false) =>
-                    fileId = id
-                    fileSize = size
+                    fileId = id; fileSize = size
                     true
                 case File(_,_,true) => false
                 case Free(_) => false
@@ -73,10 +67,10 @@ class DiskFragmenter extends PuzzleSolver {
             else    // file cannot be moved, mark it anyway
                 newDisk(fileIndexInDisk) = File(fileId, fileSize, true)
         }
-        newDisk.toList
+        newDisk.toVector
     }
 
-    private def fileSystemToBlocks(fileSystem: List[DiskBlock]): List[Int] = {
+    def fileSystemToBlocks(fileSystem: Vector[DiskBlock]): List[Int] = {
         val blocks = ArrayBuffer[Int]()
         fileSystem.foreach({
             case File(id, size, _) => blocks ++= ArrayBuffer.fill(size)(id)
@@ -86,18 +80,11 @@ class DiskFragmenter extends PuzzleSolver {
     }
 
     override def part1: Any =
-        defragmentDisk.zipWithIndex.foldLeft(0L)( (sum, curr) => sum + curr._1 * curr._2)
+        defragmentDisk.filter(_ >= 0).zipWithIndex.foldLeft(0L)( (sum, curr) => sum + curr._1 * curr._2)
 
     override def part2: Any =
         fileSystemToBlocks(defragmentFileSystem)
             .zipWithIndex.foldLeft(0L)( (sum, cur) => sum + (if cur._1 > 0 then cur._1 * cur._2 else 0))
-
-    // input parsing
-    private def readRule(s: String): (Int, Int) =
-        s match { case s"${p1}|${p2}" => (p1.toInt, p2.toInt) }
-
-    private def readPagesSection(s: String): List[Int] =
-        s.split(",").map(a => a.toInt).toList
 }
 
 object DiskFragmenter {

@@ -15,13 +15,11 @@ class TestDay09 extends AnyFlatSpec {
     it should "read input and setup list" in {
         println(solver.filesSize)
         println(solver.freeSpace)
-        println(solver.diskBlocks)
-        println(solver.disk)
+        println(solver.fileSystem)
+        val diskBlocks = solver.fileSystemToBlocks(solver.fileSystem)
         (solver.filesSize.size, solver.freeSpace.size,
-            solver.diskBlocks.map(i => if i == -1 then "." else i.toString).mkString) shouldBe
+            diskBlocks.map(i => if i == -1 then "." else i.toString).mkString) shouldBe
             (10, 9, "00...111...2...333.44.5555.6666.777.888899")
-         //          012345678901234567890123456789012345678901
-         //          0         1         2         3         4
     }
 
     it should "defragment the disk - move individual blocks" in {
@@ -35,22 +33,10 @@ class TestDay09 extends AnyFlatSpec {
         result shouldBe 1928
     }
 
-    it should "map files and free spaces" in {
-        val (files, freeMap, freeList) = solver.findFilesAndFreeBlocksIndexesAndSizes(solver.diskBlocks)
-        println(files)
-        println(s"freeMap: $freeMap")
-        println(s"freeList: $freeList")
-        println(solver.diskBlocks.map(i => if i == -1 then "." else i.toString).mkString)
-        println(files.size)
-        println(freeMap.size)
-        println(freeList.size)
-    }
-
     it should "defragment the disk - move whole files" in {
-        val defragmented = solver.defragmentDisk2
+        val defragmented = solver.defragmentFileSystem
         println(defragmented)
-        solver.defragmentFileSystem.also(println)
-        defragmented.map(i => if i == -1 then "." else i.toString).mkString shouldBe "00992111777.44.333....5555.6666.....8888.."
+        solver.fileSystemToBlocks(defragmented).map(i => if i == -1 then "." else i.toString).mkString shouldBe "00992111777.44.333....5555.6666.....8888.."
     }
 
     it should "solve part2 correctly" in {
