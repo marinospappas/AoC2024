@@ -11,10 +11,10 @@ import solutions.day07.BridgeRepair
 import solutions.day08.AntennaPositionAnalyser
 import solutions.day09.DiskFragmenter
 import solutions.day10.TrailFinder
-import solutions.day11.Day11Solver
+import solutions.day11.PebbleTransformation
 
 val solvers = Map(
     1 -> LocationAnalyser(), 2 -> ReportAnalyser(), 3 -> CorruptedMemoryCleaner(), 4 -> WordSearch(), 5 -> PrintingRules(),
     6 -> MapRouteExplorer(), 7 -> BridgeRepair(), 8 -> AntennaPositionAnalyser(), 9 -> DiskFragmenter(), 10 -> TrailFinder(),
-    11 -> Day11Solver()
+    11 -> PebbleTransformation()
 )

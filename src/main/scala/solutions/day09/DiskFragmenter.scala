@@ -17,178 +17,80 @@ class DiskFragmenter extends PuzzleSolver {
     val freeSpace: List[Int] = inputData.indices.filter(_ % 2 == 1).map( inputData(_) ).toList
     val diskBlocks: List[Int] = List.fill(filesSize.head)(0) ++
         freeSpace.indices.flatMap( i =>
-            List.fill(freeSpace(i))(-1) ++ List.fill(filesSize(i + 1))(((i + 1) % 10).toChar)
+            List.fill(freeSpace(i))(-1) ++ List.fill(filesSize(i + 1))(i + 1)
         )
 
-    var timeBuildingFreeAndFilesMap = 0L
-    var timeLookingUpFreeBlocks = 0L
-    var timeMovingFiles = 0L
-
-    val disk: ArrayBuffer[DiskBlock] = ArrayBuffer(DiskBlock.File(0, filesSize.head)) ++
+    val disk: List[DiskBlock] = List(DiskBlock.File(0, filesSize.head, true)) ++
         freeSpace.indices.flatMap(i =>
-            ArrayBuffer(Free(freeSpace(i))) ++ ArrayBuffer(File( ((i + 1) % 10).toChar, filesSize(i + 1)))
+            List(Free(freeSpace(i))) ++ List(File( i + 1, filesSize(i + 1), false))
         )
 
-    private def findNextFreeBlock(disk: ArrayBuffer[DiskBlock], fileSize: Int): (Int, Int) =
-        var size = -1
-        (disk.indexWhere ( {
-            case File(_, _) => false
+    def defragmentDisk: List[Int] = {
+        val blocks = diskBlocks.to(ArrayBuffer)
+        var (nextFile, nextFree) = (blocks.lastIndexWhere(_ >= 0), blocks.indexWhere(_ < 0))
+        while nextFile > nextFree do {
+            blocks(nextFree) = blocks(nextFile)
+            blocks(nextFile) = FREE
+            nextFree = blocks.indexWhere(_ < 0, nextFree)
+            nextFile = blocks.lastIndexWhere(_ >= 0, nextFile)
+        }
+        blocks.toList
+    }
+    
+    private def findNextFreeBlock(disk: ArrayBuffer[DiskBlock], fileSize: Int, fileIndex: Int): (Int, Int) =
+        var (indx, size) = (-1, -1)
+        ( if { indx = disk.indexWhere ( {
+            case File(_, _, _) => false
             case Free(freeSize) => size = freeSize
                 freeSize >= fileSize
-        } ), size)
+        })
+            indx < fileIndex
+        } then indx else -1, size)
 
-    def defragmentFileSystem: ArrayBuffer[DiskBlock] = {
+    def defragmentFileSystem: List[DiskBlock] = {
         val newDisk = ArrayBuffer.from(disk)
         var (fileIndexInDisk, fileId, fileSize) = (0, 0, 0)
-        while { fileIndexInDisk = disk.lastIndexWhere {
-                case File(id, size) =>
+        while { fileIndexInDisk = newDisk.lastIndexWhere {
+                case File(id, size, false) =>
                     fileId = id
                     fileSize = size
                     true
+                case File(_,_,true) => false
                 case Free(_) => false
             }
             fileIndexInDisk >= 0
         }
         do {
-            val file = newDisk(fileIndexInDisk)
-            val (nextFreeIndexOnDisk, freeBlockSize) = findNextFreeBlock(newDisk, fileSize)
-            if nextFreeIndexOnDisk > 0 then {
-                if freeBlockSize == fileSize then newDisk(nextFreeIndexOnDisk) = newDisk(fileIndexInDisk)
+            val (nextFreeIndexOnDisk, freeBlockSize) = findNextFreeBlock(newDisk, fileSize, fileIndexInDisk)
+            if nextFreeIndexOnDisk > 0 then {   // move file and free up the space
+                newDisk(fileIndexInDisk) = Free(fileSize)
+                if freeBlockSize == fileSize then newDisk(nextFreeIndexOnDisk) = File(fileId, fileSize, true)
                 else {
                     newDisk(nextFreeIndexOnDisk) = Free(freeBlockSize - fileSize)
-                    newDisk.insert(nextFreeIndexOnDisk, newDisk(fileIndexInDisk))
+                    newDisk.insert(nextFreeIndexOnDisk, File(fileId, fileSize, true))
                 }
             }
+            else    // file cannot be moved, mark it anyway
+                newDisk(fileIndexInDisk) = File(fileId, fileSize, true)
         }
-        newDisk
+        newDisk.toList
     }
 
-    def defragmentDisk: List[Int] = {
-        val blocks = diskBlocks.to(ArrayBuffer)
-        val freeBlocksIndxs = diskBlocks.zipWithIndex.filter(_._1 == FREE).map(_._2)
-        val fileBlocksIndxs = diskBlocks.zipWithIndex.filter(_._1 != FREE).map(_._2)
-        var nextFreeIndex = 0
-        var nextFileIndex = fileBlocksIndxs.size - 1
-        var lastFileBlock = blocks.size
-        while blocks.slice(freeBlocksIndxs(nextFreeIndex), lastFileBlock - 1).exists(_ != FREE) do {
-            lastFileBlock = fileBlocksIndxs(nextFileIndex)
-            blocks(freeBlocksIndxs(nextFreeIndex)) = blocks(lastFileBlock)
-            blocks(lastFileBlock) = FREE
-            nextFreeIndex += 1
-            nextFileIndex -= 1
-        }
+    private def fileSystemToBlocks(fileSystem: List[DiskBlock]): List[Int] = {
+        val blocks = ArrayBuffer[Int]()
+        fileSystem.foreach({
+            case File(id, size, _) => blocks ++= ArrayBuffer.fill(size)(id)
+            case Free(size) => blocks ++= ArrayBuffer.fill(size)(-1)
+        })
         blocks.toList
-    }
-
-    def getFirstFreeBlock(freeMap: Map[Int, List[Int]], size: Int): (Int, Int, Int) = {
-        boundary:
-            for i <- size to 9 do {
-                if freeMap.contains(i) && freeMap(i).exists(_ > 0) then
-                    break((freeMap(i).head, i, 0))
-            }
-            (-1, -1, 0)
-    }
-
-    def adjustFreeMap(freeMap: Map[Int, List[Int]], key: Int, fileSize: Int): Map[Int, List[Int]] = {
-        val newFreeMap = freeMap.to(mutable.Map)
-        val freeBlocksList = newFreeMap(key)
-        val updatedBlocksList = freeBlocksList.slice(1, freeBlocksList.size)
-        val firstFreeBlock = newFreeMap(key).head
-        if updatedBlocksList.isEmpty then newFreeMap.remove(key)
-        else newFreeMap.put(key, freeBlocksList.slice(1, freeBlocksList.size))
-        if key > fileSize then     // free space was > file size
-            newFreeMap.put(key - fileSize,
-                (freeMap.getOrElse(key - fileSize, List()) :+ (firstFreeBlock + fileSize)).sorted )
-        newFreeMap.toMap
-    }
-
-    def getFirstFreeBlock(freeList: List[(Int, Int)], size: Int): (Int, Int, Int) = {
-        boundary:
-            for i <- freeList.indices do {
-                if freeList(i)._2 >= size then
-                    break((freeList(i)._1, freeList(i)._2, i))
-            }
-            (-1, -1, -1)
-    }
-
-    def adjustFreeList(freeList: List[(Int, Int)], index: Int, fileSize: Int): List[(Int, Int)] = {
-        val newFreeList = freeList.to(ArrayBuffer)
-        val (firstFreeBlock, firstFreeBlockSize) = newFreeList(index)
-        if firstFreeBlockSize > fileSize then newFreeList(index) = (firstFreeBlock + fileSize, firstFreeBlockSize - fileSize)
-        else newFreeList.remove(index)
-        newFreeList.toList
-    }
-
-    def moveFile(blocks: ArrayBuffer[Int], from: Int, to: Int, length: Int): Unit = {
-        val fileId = blocks(from)
-        val start = System.nanoTime()
-        for i <- 0 until length do {
-            blocks(to + i) = fileId
-            blocks(from + i) = FREE
-        }
-    }
-
-    // TODO: fix bug caused by the introduction of the map of free blocks - affects part 2
-    def defragmentDisk2: List[Int] = {
-        val blocks = diskBlocks.to(ArrayBuffer)
-        val (filesBlocks, freeBlocks, freeBlocksList) = findFilesAndFreeBlocksIndexesAndSizes(blocks.toList)
-        var freeMap = freeBlocks
-        var freeList = freeBlocksList
-        var curFileIndx = filesBlocks.size - 1
-        while {
-            val (fileStart, fileSize) = filesBlocks(curFileIndx)
-            // find first free block that fits the file
-            val start = System.nanoTime()
-            val (firstFreeBlock, firstFreeBlockSize, ignore) = getFirstFreeBlock(freeMap, fileSize)
-            // val (firstFreeBlock, firstFreeBlockSize, freeListKey) = getFirstFreeBlock(freeList, fileSize)
-            timeLookingUpFreeBlocks += (System.nanoTime() - start)
-            if firstFreeBlockSize >= 0 then {
-                // if such a block exists move the file
-                moveFile(blocks, fileStart, firstFreeBlock, fileSize)
-                timeMovingFiles += (System.nanoTime() - start)
-                // and adjust the free map
-                freeMap = adjustFreeMap(freeMap, firstFreeBlockSize, fileSize)
-                // freeList = adjustFreeList(freeList, freeListKey, fileSize)
-            }
-            curFileIndx -= 1
-            curFileIndx >= 0
-        } do {}
-        blocks.toList
-    }
-
-    def findFilesAndFreeBlocksIndexesAndSizes(diskBlocks: List[Int]): (List[(Int, Int)], Map[Int, List[Int]], List[(Int, Int)]) = {     // start index, size
-        val start = System.nanoTime()
-        val files = ArrayBuffer[(Int, Int)]((0, filesSize.head))       // position of block, size
-        val freeList = ArrayBuffer[(Int, Int)]()
-        val freeMap = mutable.Map[Int, List[Int]]()     // size of free block -> list of positions in the disk
-        var curIndex = filesSize.head
-        for i <- freeSpace.indices do {
-            if freeSpace(i) > 0 then {
-                freeMap.put(freeSpace(i), freeMap.getOrElse(freeSpace(i), List()) :+ curIndex)
-                freeList += ((curIndex, freeSpace(i)))
-            }
-            curIndex += freeSpace(i)
-            files += ((curIndex, filesSize(i + 1)))
-            curIndex += filesSize(i + 1)
-        }
-        timeBuildingFreeAndFilesMap = System.nanoTime() - start
-        (files.toList, freeMap.toMap, freeList.toList)
     }
 
     override def part1: Any =
-        defragmentDisk.filter(_ != FREE).zipWithIndex.map(e => e._1.toLong * e._2).sum
+        defragmentDisk.zipWithIndex.foldLeft(0L)( (sum, curr) => sum + curr._1 * curr._2)
 
     override def part2: Any =
-        val result = defragmentDisk2
-        val start = System.nanoTime()
-        //val result1 = result.zipWithIndex.map(e => if e._1 == FREE then 0 else e._1.toLong * e._2.toLong).sum
-        val result1 = result.zipWithIndex.filter(_._1 != FREE).foldLeft(0L)( (sum, cur) => sum + cur._1 * cur._2)
-        val elapsed = System.nanoTime() - start
-        println(s"Build free and files map: ${timeBuildingFreeAndFilesMap / 1000000}")
-        println(s"Lookup free space       : ${timeLookingUpFreeBlocks / 1000000}")
-        println(s"Move files              : ${timeMovingFiles / 1000000}")
-        println(s"Calculate result        : ${elapsed / 1000000}")
-        result1
+        fileSystemToBlocks(defragmentFileSystem)
+            .zipWithIndex.foldLeft(0L)( (sum, cur) => sum + (if cur._1 > 0 then cur._1 * cur._2 else 0))
 
     // input parsing
     private def readRule(s: String): (Int, Int) =
@@ -202,7 +104,7 @@ object DiskFragmenter {
     val FREE = -1
 
     enum DiskBlock {
-        case File(id: Int, size: Int)
+        case File(id: Int, size: Int, defrag: Boolean)
         case Free(size: Int)
     }
 }

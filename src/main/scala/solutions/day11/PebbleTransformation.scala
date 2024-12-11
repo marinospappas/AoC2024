@@ -8,14 +8,14 @@ import scala.math.abs
 import scala.util.boundary
 import scala.util.boundary.break
 
-class Day11Solver extends PuzzleSolver {
+class PebbleTransformation extends PuzzleSolver {
 
-    val inputData: List[String] = InputReader.read(11)
+    val inputData: List[Int] = InputReader.read(11).head.split(" ").map(_.toInt).toList
 
     override def part1: Any =
         ""
 
     override def part2: Any =
         ""
-    
+
 }

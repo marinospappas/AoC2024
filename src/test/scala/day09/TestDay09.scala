@@ -44,12 +44,12 @@ class TestDay09 extends AnyFlatSpec {
         println(files.size)
         println(freeMap.size)
         println(freeList.size)
-        solver.defragmentFileSystem.also(println)
     }
 
     it should "defragment the disk - move whole files" in {
         val defragmented = solver.defragmentDisk2
         println(defragmented)
+        solver.defragmentFileSystem.also(println)
         defragmented.map(i => if i == -1 then "." else i.toString).mkString shouldBe "00992111777.44.333....5555.6666.....8888.."
     }
 
