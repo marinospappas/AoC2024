@@ -21,20 +21,19 @@ class TestDay11 extends AnyFlatSpec {
     }
 
     it should "executes transformation rules" in {
-        val result = solver.transformStonesSeq(List("0", "1", "10", "99", "999").map(Stone.fromString(0, _)))
+        val result = solver.transformStonesSeq(List("0", "1", "10", "99", "999").map(Stone.fromString))
         println(result)
-        result shouldBe List("1", "2024", "1", "0", "9", "9", "2021976").map(Stone.fromString(1, _))
+        result shouldBe List("1", "2024", "1", "0", "9", "9", "2021976").map(Stone.fromString)
     }
-
-    it should "traverse stones list using bfs" in {
-        val result = solver.traverseStonesBfs(Stone.START, 25)
-        println(result)
-        //result shouldBe List("1", "2024", "1", "0", "9", "9", "2021976").map(Stone.fromString(1, _))
-    }
-
 
     it should "solve part1 correctly" in {
         val result = solver.part1.also(println)
         result shouldBe 55312
     }
+
+    it should "solve part2 correctly" in {
+        val result = solver.part2.also(println)
+        result shouldBe 55312
+    }
+
 }
