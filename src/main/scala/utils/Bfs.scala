@@ -51,6 +51,22 @@ class Bfs[T](g: Graph[T]) {
         allPaths.map(_.toList).toList
     }
 
+    def traverseGraph (start: T, f: T => Unit): Unit = {
+        val queue = util.ArrayDeque[T]()
+        var curPath = ArrayBuffer[T](start)
+        val visited = mutable.Set[T](start)
+        while !queue.isEmpty do {
+            val current = queue.removeFirst()
+            f(current)
+            g.getConnected(current).foreach ( connection =>
+                if (!visited.contains(connection._1)) {
+                    visited.add(connection._1)
+                    queue.add(connection._1)
+                }
+            )
+        }
+    }
+    
     /*def getAllConnectedNodes(from: T): Set<T> {
         val visited = mutableSetOf(from)
         val queue = ArrayDeque<T>().also { l -> l.add(from) }
