@@ -6,12 +6,11 @@ import solutions.day11.PebbleTransformation.Stone.{EVEN_DIGITS, ODD_DIGITS, STAR
 import solutions.day11.PebbleTransformation.Stone
 
 import scala.collection.{immutable, mutable}
-import scala.collection.mutable.{ArrayBuffer, Map}
+import scala.collection.mutable.ArrayBuffer
 
 class PebbleTransformation extends PuzzleSolver {
 
     val inputData: List[Stone] = InputReader.read(11).head.split(" ").toList.map( Stone.fromString )
-    private val cache = mutable.Map[Stone, Long]()
 
     def getNextStones(stone: Stone): List[Stone] = {
         stone match
@@ -21,27 +20,28 @@ class PebbleTransformation extends PuzzleSolver {
             case ODD_DIGITS(number) => List(Stone.fromString((number.toLong * 2024).toString))
     }
 
-    def transformWithCache(stones: List[Stone], n: Int): Long = {
+    def transformWithDictionary(stones: List[Stone], n: Int): Map[Stone, Long] = {
         var count = 0
-        var cache = stones.map(stone => stone -> 1L).toMap
+        var dictionary = stones.map(stone => stone -> 1L).toMap
         while { count += 1
             count <= n
         } do {
-            val newCache = mutable.Map[Stone, Long]()
-            cache.foreach( (stone, curValue) =>
+            val newDictionary = mutable.Map[Stone, Long]()
+            dictionary.foreach( (stone, curValue) =>
                 for newStone <- getNextStones(stone) do
-                    newCache.put(newStone, newCache.getOrElse(newStone, 0L) + curValue)
+                    newDictionary.put(newStone, newDictionary.getOrElse(newStone, 0L) + curValue)
             )
-            cache = immutable.Map.from(newCache)
+            dictionary = immutable.Map.from(newDictionary)
         }
-        cache.values.sum
+        if AocMain.environment != "prod" then dictionary.foreach(println)
+        dictionary
     }
 
     override def part1: Any =
-        transformWithCache(inputData, 25)
+        transformWithDictionary(inputData, 25).values.sum
 
     override def part2: Any =
-        transformWithCache(inputData, 75)
+        transformWithDictionary(inputData, 75).values.sum
 
 }
 

@@ -2,7 +2,6 @@ package org.mpdev.scala.aoc2024
 package day11
 
 import framework.{AocMain, InputReader}
-import solutions.day10.TrailFinder
 import utils.also
 import solutions.day11.PebbleTransformation
 
@@ -21,9 +20,10 @@ class TestDay11 extends AnyFlatSpec {
     }
 
     it should "executes transformation rules" in {
-        val result = solver.transformStonesSeq(List("0", "1", "10", "99", "999").map(Stone.fromString))
-        println(result)
-        result shouldBe List("1", "2024", "1", "0", "9", "9", "2021976").map(Stone.fromString)
+        val result = solver.transformWithDictionary(List("0", "1", "10", "99", "999").map(Stone.fromString), 1)
+        result.foreach(println)
+        val expectedResult = List("1", "2024", "1", "0", "9", "9", "2021976") //.map(Stone.fromString -> 1)
+        result.toList shouldBe expectedResult
     }
 
     it should "solve part1 correctly" in {
@@ -33,7 +33,7 @@ class TestDay11 extends AnyFlatSpec {
 
     it should "solve part2 correctly" in {
         val result = solver.part2.also(println)
-        result shouldBe 55312
+        result shouldBe 65601038650482L
     }
 
 }

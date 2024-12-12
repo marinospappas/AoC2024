@@ -1,7 +1,9 @@
 package org.mpdev.scala.aoc2024
 package utils
 
-import scala.reflect.ClassTag
+import java.util
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 open class SimpleGrid(gridData: List[String]) {
 
@@ -20,6 +22,9 @@ open class SimpleGrid(gridData: List[String]) {
 
     def getDataValues: Set[Char] = data.flatten.toSet
 
+    def getAllCoordinates: Vector[(Int, Int)] =
+        (for x <- 0 to maxX; y <- 0 to maxY yield (x, y)).toVector
+        
     // TODO: tidy this up to take (Int, Int) as input
     def getAdjacent(p: Point, includeDiagonals: Boolean = false): Set[Point] =
         (if (includeDiagonals) p.adjacent() else p.adjacentCardinal()).toSet
@@ -58,6 +63,33 @@ open class SimpleGrid(gridData: List[String]) {
 
     // TODO: need also indexToPos
     def posToIndex(pos: (Int, Int)): Int = pos._2 * maxY + pos._1
+
+    def getAdjacentArea(point: (Int, Int)): Vector[(Int, Int)] = {
+        val visited = ArrayBuffer(point)
+        val queue = util.ArrayDeque[(Int, Int)]()
+        queue.add(point)
+        val value = data(point._2)(point._1)
+        while !queue.isEmpty do {
+            val current = queue.removeFirst()
+            current.adjacentCardinal.filter( p => isInsideGrid(p) && data(p._2)(p._1) == value )
+                .foreach ( connection => 
+                    if !visited.contains(connection) then {
+                        visited += connection
+                        queue.add(connection)
+                    }
+            )
+        }
+        visited.toVector
+    }
+    
+    def getPerimeter(area: Vector[(Int, Int)]): Int = {
+        var perimeter = 0
+        area.foreach( point =>
+            val adjacentInArea = point.adjacentCardinal.filter( p => area.contains(p) )
+            perimeter += (4 - adjacentInArea.size)
+        )
+        perimeter
+    }
     
     def printIt(): Unit = {
         for i <- data.indices do
@@ -67,6 +99,20 @@ open class SimpleGrid(gridData: List[String]) {
     }
 }
 
+extension (p: (Int, Int)) {
+    def adjacent(diagonally: Boolean = true): Vector[(Int, Int)] =
+        val (x, y) = p
+        if (diagonally)
+            Vector(
+                (x - 1, y), (x - 1, y - 1), (x, y - 1), (x + 1, y - 1),
+                (x + 1, y), (x + 1, y + 1), (x, y + 1), (x - 1, y + 1)
+            )
+        else
+            Vector((x - 1, y), (x, y - 1), (x + 1, y), (x, y + 1))
+
+    def adjacentCardinal: Vector[(Int, Int)] = adjacent(false)
+}
+    
 object SimpleGrid {
     val DEFAULT_CHAR = '.'
     val allCharsDefMapper: Map[Char, Char] = (' ' to '~').map(c => c -> c).toMap
