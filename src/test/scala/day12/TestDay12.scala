@@ -15,8 +15,7 @@ class TestDay12 extends AnyFlatSpec {
 
     it should "read input and setup reports list" in {
         solver.plotsGrid.printIt()
-        println(solver.allCoords)
-        (solver.plotsGrid.getDimensions, solver.allCoords.size) shouldBe ((10, 10), 100)
+        (solver.plotsGrid.getDimensions, solver.plotsGrid.getAllCoordinates.size) shouldBe ((10, 10), 100)
     }
 
     private val grid1 = List(
@@ -34,17 +33,41 @@ class TestDay12 extends AnyFlatSpec {
     )
 
     it should "identify all plots" in {
-        val grid = SimpleGrid(InputReader.read(12, "src/test/resources/input/input"))
+        val grid = SimpleGrid(grid1)
         val plots = solver.findAllPlots(grid)
-        plots.foreach(println)
-        plots.map(_._2.size).sum shouldBe grid.getDimensions._1 * grid.getDimensions._2
+        plots.foreach( plot => println(plot._2.sortWith( (p1, p2) => SimpleGrid.compareYX(p1, p2))))
+        (plots.size, plots.map(_._2.size).sum) shouldBe (5, grid.getDimensions._1 * grid.getDimensions._2)
     }
 
     it should "calculate perimeter" in {
-        val grid = SimpleGrid(grid1)
+        val grid = SimpleGrid(grid2)
         val plots = solver.findAllPlots(grid)
         val perimeters = plots.map( plot => (plot._1, grid.getPerimeter(plot._2)))
         perimeters.foreach(println)
+        perimeters.map(_._2).sum shouldBe 52
+    }
+    
+    private val grid3 = List(
+        "EEEEE",
+        "EXXXX",
+        "EEEEE",
+        "EXXXX",
+        "EEEEE"
+    )
+    private val grid4 = List(
+        "AAAAAA",
+        "AAA..A",
+        "AAA..A",
+        "A..AAA",
+        "A..AAA",
+        "AAAAAA"
+    )
+    it should "calculate sides" in {
+        val grid = SimpleGrid(grid4)
+        val plots = solver.findAllPlots(grid)
+        val sides = plots.map(plot => (plot._1, grid.getNumberOfSides(plot._2)))
+        sides.foreach(println)
+        sides.find( _._1 == 'A').get._2 shouldBe 12
     }
 
     it should "solve part1 correctly" in {
@@ -52,6 +75,7 @@ class TestDay12 extends AnyFlatSpec {
     }
 
     it should "solve part2 correctly" in {
-        solver.part2 shouldBe 4
+        solver.part1
+        solver.part2 shouldBe 1206
     }
 }

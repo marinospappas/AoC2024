@@ -16,7 +16,6 @@ import scala.util.{Failure, Success, boundary}
 class FenceCalculator extends PuzzleSolver {
 
     val plotsGrid: SimpleGrid = SimpleGrid(InputReader.read(12))
-    val allCoords: Vector[(Int, Int)] = plotsGrid.getAllCoordinates
     var allPlots: Vector[(Char, Vector[(Int, Int)])] = Vector()
     
     def findAllPlots(grid: SimpleGrid): Vector[(Char, Vector[(Int, Int)])] = {
@@ -41,6 +40,7 @@ class FenceCalculator extends PuzzleSolver {
     }
 
     override def part2: Any = {
-        ""
+        allPlots.map(plot => (plot._1, plot._2.size, plotsGrid.getNumberOfSides(plot._2)))
+            .foldLeft(0)((sum, cur) => sum + cur._2 * cur._3)
     }
 }
