@@ -1,6 +1,9 @@
 package org.mpdev.scala.aoc2024
 package utils
 
+import utils.SimpleGrid.Direction
+import utils.SimpleGrid.Direction.*
+
 import java.util
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -12,7 +15,7 @@ open class SimpleGrid(gridData: List[String]) {
     private val maxY: Int = data.length - 1
 
     def getDataPoint(p: (Int, Int)): Char = data(p._2)(p._1)
-        
+
     def getDataPointOrNull(p: (Int, Int)): Char | Null =
         if isInsideGrid(p) then data(p._2)(p._1) else null
     
@@ -24,7 +27,7 @@ open class SimpleGrid(gridData: List[String]) {
 
     def getAllCoordinates: Vector[(Int, Int)] =
         (for x <- 0 to maxX; y <- 0 to maxY yield (x, y)).toVector
-        
+
     // TODO: tidy this up to take (Int, Int) as input
     def getAdjacent(p: Point, includeDiagonals: Boolean = false): Set[Point] =
         (if (includeDiagonals) p.adjacent() else p.adjacentCardinal()).toSet
@@ -72,7 +75,7 @@ open class SimpleGrid(gridData: List[String]) {
         while !queue.isEmpty do {
             val current = queue.removeFirst()
             current.adjacentCardinal.filter( p => isInsideGrid(p) && data(p._2)(p._1) == value )
-                .foreach ( connection => 
+                .foreach ( connection =>
                     if !visited.contains(connection) then {
                         visited += connection
                         queue.add(connection)
@@ -81,7 +84,7 @@ open class SimpleGrid(gridData: List[String]) {
         }
         visited.toVector
     }
-    
+
     def getPerimeter(area: Vector[(Int, Int)]): Int = {
         var perimeter = 0
         area.foreach( point =>
@@ -89,6 +92,52 @@ open class SimpleGrid(gridData: List[String]) {
             perimeter += (4 - adjacentInArea.size)
         )
         perimeter
+    }
+
+    def getNumberOfSides(area: Vector[(Int, Int)]): Int = {
+        val horizGroups = area.groupBy(_._2).map( (k, v) => (k, v.sortBy( _._1 )) ).toVector.sortBy(_._1)
+        val vertGroups = area.groupBy(_._1).map( (k, v) => (k, v.sortBy( _._2 )) ).toVector.sortBy(_._1)
+        countVertEdges(horizGroups) + countHorizEdges(vertGroups)
+    }
+
+    private def countVertEdges(ptsGrouped: Vector[(Int, Vector[(Int, Int)])]): Int = {
+        var numberOfEdges = 0
+        var prevEdges = Set[(Int, Direction)]()
+        ptsGrouped.foreach(g =>
+            val thisEdges = mutable.Set((g._2.head._1, W))
+            for i <- 1 until g._2.size do 
+                if g._2(i)._1 != g._2(i - 1)._1 + 1 then {
+                    thisEdges += ((g._2(i - 1)._1 + 1, E))
+                    thisEdges += ((g._2(i)._1, W))
+                }
+            thisEdges += ((g._2.last._1 + 1, E))
+            numberOfEdges += (
+                if prevEdges.isEmpty then thisEdges.size 
+                else thisEdges.size - thisEdges.intersect(prevEdges).size
+            )  
+            prevEdges = Set.from(thisEdges)
+        ) 
+        numberOfEdges
+    }
+
+    private def countHorizEdges(ptsGrouped: Vector[(Int, Vector[(Int, Int)])]): Int = {
+        var numberOfEdges = 0
+        var prevEdges = Set[(Int, Direction)]()
+        ptsGrouped.foreach(g =>
+            val thisEdges = mutable.Set((g._2.head._2, N))
+            for i <- 1 until g._2.size do
+                if g._2(i)._2 != g._2(i - 1)._2 + 1 then {
+                    thisEdges += ((g._2(i - 1)._2 + 1, S))
+                    thisEdges += ((g._2(i)._2, N))
+                }
+            thisEdges += ((g._2.last._2 + 1, S))
+            numberOfEdges += (
+                if prevEdges.isEmpty then thisEdges.size
+                else thisEdges.size - thisEdges.intersect(prevEdges).size
+            )
+            prevEdges = Set.from(thisEdges)
+        )
+        numberOfEdges
     }
     
     def printIt(): Unit = {
@@ -112,7 +161,7 @@ extension (p: (Int, Int)) {
 
     def adjacentCardinal: Vector[(Int, Int)] = adjacent(false)
 }
-    
+
 object SimpleGrid {
     val DEFAULT_CHAR = '.'
     val allCharsDefMapper: Map[Char, Char] = (' ' to '~').map(c => c -> c).toMap
@@ -160,6 +209,12 @@ object SimpleGrid {
         def allCardinal: Set[Direction] = Set(N, E, S, W)
 
         def allDirections: Set[Direction] = allCardinal ++ Set(NE, SE, SW, NW)
+    }
+
+    def compareYX(p1: (Int, Int), p2: (Int, Int)): Boolean = {
+        if p1._2 < p2._2 then true
+        else if p1._2 > p2._2 then false
+        else p1._1 < p2._1
     }
 }
 

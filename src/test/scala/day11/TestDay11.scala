@@ -4,8 +4,9 @@ package day11
 import framework.{AocMain, InputReader}
 import utils.also
 import solutions.day11.PebbleTransformation
-
 import solutions.day11.PebbleTransformation.Stone
+import solutions.day11.PebbleTransformation.Stone.{EVEN_DIGITS, ODD_DIGITS, ZERO}
+
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
 
@@ -23,7 +24,9 @@ class TestDay11 extends AnyFlatSpec {
         val result = solver.transformWithDictionary(List("0", "1", "10", "99", "999").map(Stone.fromString), 1)
         result.foreach(println)
         val expectedResult = List("1", "2024", "1", "0", "9", "9", "2021976") //.map(Stone.fromString -> 1)
-        result.toList shouldBe expectedResult
+        result shouldBe Map(
+            ZERO -> 1L, ODD_DIGITS("1") -> 2L, ODD_DIGITS("9") -> 2L, EVEN_DIGITS("2024") -> 1L, ODD_DIGITS("2021976") -> 1L 
+        )
     }
 
     it should "solve part1 correctly" in {
