@@ -67,18 +67,19 @@ class Bfs[T](g: Graph[T]) {
         }
     }
     
-    /*def getAllConnectedNodes(from: T): Set<T> {
-        val visited = mutableSetOf(from)
-        val queue = ArrayDeque<T>().also { l -> l.add(from) }
-        while (queue.isNotEmpty()) {
+    def getAllConnectedNodes(from: T): Set[T] = {
+        val visited = mutable.Set(from)
+        val queue = util.ArrayDeque[T]()
+        queue.add(from)
+        while !queue.isEmpty do {
             val current = queue.removeFirst()
-            getConnected(current).map { it.first }.sortedBy { it }.forEach { connection ->
-                if (!visited.contains(connection)) {
+            g.getConnected(current).map( _._1 ).foreach( connection =>
+                if !visited.contains(connection) then {
                     visited.add(connection)
                     queue.add(connection)
                 }
-            }
+            )
         }
-        return visited
-    }*/
+        visited.toSet
+    }
 }

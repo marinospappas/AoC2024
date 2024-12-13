@@ -100,14 +100,9 @@ open class SimpleGrid(gridData: List[String]) {
     private def countVertEdges(ptsGrouped: Vector[(Int, Vector[(Int, Int)])]): Int = {
         var numberOfEdges = 0
         var prevEdges = Set[(Int, Direction)]()
-        ptsGrouped.foreach(g =>
-            val thisEdges = mutable.Set((g._2.head.x, W))
-            for i <- 1 until g._2.size do 
-                if g._2(i).x != g._2(i - 1).x + 1 then {
-                    thisEdges += ((g._2(i - 1).x + 1, E))
-                    thisEdges += ((g._2(i).x, W))
-                }
-            thisEdges += ((g._2.last.x + 1, E))
+        ptsGrouped.map( _._2 ).foreach(g =>
+            val thisEdges = Set((g.head.x, W)) ++ Set((g.last.x + 1, E)) ++
+                g.map(_.x).sliding(2).toList.filter( x => x.size > 1 && x.head + 1 != x(1)).flatMap( x => Set((x.head + 1, E), (x(1), W)) ).toSet
             numberOfEdges += (
                 if prevEdges.isEmpty then thisEdges.size 
                 else thisEdges.size - thisEdges.intersect(prevEdges).size
@@ -120,14 +115,9 @@ open class SimpleGrid(gridData: List[String]) {
     private def countHorizEdges(ptsGrouped: Vector[(Int, Vector[(Int, Int)])]): Int = {
         var numberOfEdges = 0
         var prevEdges = Set[(Int, Direction)]()
-        ptsGrouped.foreach(g =>
-            val thisEdges = mutable.Set((g._2.head.y, N))
-            for i <- 1 until g._2.size do
-                if g._2(i).y != g._2(i - 1).y + 1 then {
-                    thisEdges += ((g._2(i - 1).y + 1, S))
-                    thisEdges += ((g._2(i).y, N))
-                }
-            thisEdges += ((g._2.last.y + 1, S))
+        ptsGrouped.map( _._2 ).foreach(g =>
+            val thisEdges = Set((g.head.y, N)) ++ Set((g.last.y + 1, S)) ++
+                g.map( _.y ).sliding(2).filter( y => y.size > 1 && y.head + 1 != y(1)).flatMap( y => Set((y.head + 1, S), (y(1), N)) ).toSet
             numberOfEdges += (
                 if prevEdges.isEmpty then thisEdges.size
                 else thisEdges.size - thisEdges.intersect(prevEdges).size
