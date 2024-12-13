@@ -126,13 +126,16 @@ open class SimpleGrid(gridData: List[String]) {
         )
         numberOfEdges
     }
-    
-    def printIt(): Unit = {
-        for i <- data.indices do
-            (f"${i % 100}%2d " + data(i).mkString).printLn()
-        ("   " + data.head.indices.map( x => if x % 10 == 0 then ((x / 10) % 10).toString else " " ).mkString).printLn()
-        ("   " + data.head.indices.map( x => (x % 10).toString ).mkString).printLn()
+
+    override def toString: String = {
+        val sb = StringBuilder()
+        sb.append((for i <- data.indices yield f"${i % 100}%2d " + data(i).mkString).mkString("\n"))
+        sb.append("\n   " + data.head.indices.map(x => if x % 10 == 0 then ((x / 10) % 10).toString else " ").mkString)
+        sb.append("\n   " + data.head.indices.map(x => (x % 10).toString).mkString)
+        sb.toString()
     }
+    
+    def printIt(): Unit = println(this.toString)
 }
 
 extension (p: (Int, Int)) {
