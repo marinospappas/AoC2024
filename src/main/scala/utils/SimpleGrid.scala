@@ -17,9 +17,9 @@ open class SimpleGrid(gridData: List[String]) {
     def getDataPoint(p: (Int, Int)): Char = data(p._2)(p._1)
 
     def getDataPointOrNull(p: (Int, Int)): Char | Null =
-        if isInsideGrid(p) then data(p._2)(p._1) else null
+        if isInsideGrid(p) then data(p.y)(p.x) else null
     
-    def setDataPoint(p: (Int, Int), d: Char): Unit = data(p._2)(p._1) = d
+    def setDataPoint(p: (Int, Int), d: Char): Unit = data(p.y)(p.x) = d
 
     def getDataPoints: Array[Array[Char]] = data
 
@@ -28,15 +28,12 @@ open class SimpleGrid(gridData: List[String]) {
     def getAllCoordinates: Vector[(Int, Int)] =
         (for x <- 0 to maxX; y <- 0 to maxY yield (x, y)).toVector
 
-    // TODO: tidy this up to take (Int, Int) as input
-    def getAdjacent(p: Point, includeDiagonals: Boolean = false): Set[Point] =
-        (if (includeDiagonals) p.adjacent() else p.adjacentCardinal()).toSet
+    def getAdjacent(p: (Int, Int), includeDiagonals: Boolean = false): Set[(Int, Int)] =
+        (if (includeDiagonals) p.adjacent() else p.adjacentCardinal).toSet
 
-    def getAdjacentValues(p: (Int, Int), includeDiagonals: Boolean = false): List[Char] = {
-        val point = Point(p._1, p._2)
-        (if (includeDiagonals) point.adjacent() else point.adjacentCardinal())
+    def getAdjacentValues(p: (Int, Int), includeDiagonals: Boolean = false): List[Char] =
+        (if (includeDiagonals) p.adjacent() else p.adjacentCardinal)
             .map( pos => data(pos.y)(pos.x) ).toList
-    }
 
     def findFirst(d: Char): (Int, Int) = {
         val y = (0 to maxY).find( data(_).contains(d) ).getOrElse(-1)
@@ -59,22 +56,22 @@ open class SimpleGrid(gridData: List[String]) {
     def countOf(item: Char): Int = data.map(_.toList).toList.flatten.count( _ == item )
     
     def nextPoint(p: (Int, Int)): (Int, Int) = 
-        if (p._1 < maxX) (p._1 + 1, p._2)
-        else (0, p._2 + 1)
+        if (p.x < maxX) (p.x + 1, p.y)
+        else (0, p.y + 1)
 
-    def isInsideGrid(p: (Int, Int)): Boolean = 0 <= p._1 && p._1 <= maxX && 0 <= p._2 && p._2 <= maxY
+    def isInsideGrid(p: (Int, Int)): Boolean = 0 <= p.x && p.x <= maxX && 0 <= p.y && p.y <= maxY
 
     // TODO: need also indexToPos
-    def posToIndex(pos: (Int, Int)): Int = pos._2 * maxY + pos._1
+    def posToIndex(pos: (Int, Int)): Int = pos.y * maxY + pos.x
 
     def getAdjacentArea(point: (Int, Int)): Vector[(Int, Int)] = {
         val visited = ArrayBuffer(point)
         val queue = util.ArrayDeque[(Int, Int)]()
         queue.add(point)
-        val value = data(point._2)(point._1)
+        val value = data(point.y)(point.x)
         while !queue.isEmpty do {
             val current = queue.removeFirst()
-            current.adjacentCardinal.filter( p => isInsideGrid(p) && data(p._2)(p._1) == value )
+            current.adjacentCardinal.filter( p => isInsideGrid(p) && data(p.y)(p.x) == value )
                 .foreach ( connection =>
                     if !visited.contains(connection) then {
                         visited += connection
@@ -95,8 +92,8 @@ open class SimpleGrid(gridData: List[String]) {
     }
 
     def getNumberOfSides(area: Vector[(Int, Int)]): Int = {
-        val horizGroups = area.groupBy(_._2).map( (k, v) => (k, v.sortBy( _._1 )) ).toVector.sortBy(_._1)
-        val vertGroups = area.groupBy(_._1).map( (k, v) => (k, v.sortBy( _._2 )) ).toVector.sortBy(_._1)
+        val horizGroups = area.groupBy(_.y).map( (k, v) => (k, v.sortBy( _.x )) ).toVector.sortBy(_._1)
+        val vertGroups = area.groupBy(_.x).map( (k, v) => (k, v.sortBy( _.y )) ).toVector.sortBy(_._1)
         countVertEdges(horizGroups) + countHorizEdges(vertGroups)
     }
 
@@ -104,13 +101,13 @@ open class SimpleGrid(gridData: List[String]) {
         var numberOfEdges = 0
         var prevEdges = Set[(Int, Direction)]()
         ptsGrouped.foreach(g =>
-            val thisEdges = mutable.Set((g._2.head._1, W))
+            val thisEdges = mutable.Set((g._2.head.x, W))
             for i <- 1 until g._2.size do 
-                if g._2(i)._1 != g._2(i - 1)._1 + 1 then {
-                    thisEdges += ((g._2(i - 1)._1 + 1, E))
-                    thisEdges += ((g._2(i)._1, W))
+                if g._2(i).x != g._2(i - 1).x + 1 then {
+                    thisEdges += ((g._2(i - 1).x + 1, E))
+                    thisEdges += ((g._2(i).x, W))
                 }
-            thisEdges += ((g._2.last._1 + 1, E))
+            thisEdges += ((g._2.last.x + 1, E))
             numberOfEdges += (
                 if prevEdges.isEmpty then thisEdges.size 
                 else thisEdges.size - thisEdges.intersect(prevEdges).size
@@ -124,13 +121,13 @@ open class SimpleGrid(gridData: List[String]) {
         var numberOfEdges = 0
         var prevEdges = Set[(Int, Direction)]()
         ptsGrouped.foreach(g =>
-            val thisEdges = mutable.Set((g._2.head._2, N))
+            val thisEdges = mutable.Set((g._2.head.y, N))
             for i <- 1 until g._2.size do
-                if g._2(i)._2 != g._2(i - 1)._2 + 1 then {
-                    thisEdges += ((g._2(i - 1)._2 + 1, S))
-                    thisEdges += ((g._2(i)._2, N))
+                if g._2(i).y != g._2(i - 1).y + 1 then {
+                    thisEdges += ((g._2(i - 1).y + 1, S))
+                    thisEdges += ((g._2(i).y, N))
                 }
-            thisEdges += ((g._2.last._2 + 1, S))
+            thisEdges += ((g._2.last.y + 1, S))
             numberOfEdges += (
                 if prevEdges.isEmpty then thisEdges.size
                 else thisEdges.size - thisEdges.intersect(prevEdges).size

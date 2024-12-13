@@ -2,7 +2,7 @@ package org.mpdev.scala.aoc2024
 package solutions.day10
 
 import framework.{AocMain, InputReader, PuzzleSolver}
-import utils.{Bfs, Graph, Point, SimpleGrid}
+import utils.{Bfs, Graph, Point, SimpleGrid, x, y}
 import solutions.day10.TrailFinder.{TRAIL_END, TRAIL_START, initGraph}
 
 class TrailFinder(var testData: List[String] = List()) extends PuzzleSolver {
@@ -45,7 +45,7 @@ object TrailFinder {
                 val datum = grid.getDataPoint((x, y))
                 val node = (x, y, datum)
                 if TRAIL.contains(datum) then {
-                    val neighbours = grid.getAdjacent(Point(x, y))
+                    val neighbours = grid.getAdjacent((x, y))
                         .filter(pos => grid.isInsideGrid((pos.x, pos.y)))
                         .filter(pos => TRAIL.contains(grid.getDataPoint((pos.x, pos.y)))
                             && grid.getDataPoint((pos.x, pos.y)) == datum + 1)

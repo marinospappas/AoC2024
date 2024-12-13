@@ -14,4 +14,8 @@ extension (pair: (Int, Int))
 
     @targetName("times")
     def *(n: Int): (Int, Int) =
-        (pair._1 * n, pair._2 * n)    
+        (pair._1 * n, pair._2 * n)
+
+    def x: Int = pair._1
+
+    def y: Int = pair._2
