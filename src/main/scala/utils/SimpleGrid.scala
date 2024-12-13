@@ -137,14 +137,8 @@ open class SimpleGrid(gridData: List[String]) {
 
 extension (p: (Int, Int)) {
     def adjacent(diagonally: Boolean = true): Vector[(Int, Int)] =
-        val (x, y) = p
-        if (diagonally)
-            Vector(
-                (x - 1, y), (x - 1, y - 1), (x, y - 1), (x + 1, y - 1),
-                (x + 1, y), (x + 1, y + 1), (x, y + 1), (x - 1, y + 1)
-            )
-        else
-            Vector((x - 1, y), (x, y - 1), (x + 1, y), (x, y + 1))
+        if diagonally then Vector.from(allDirections.map( dir => p + dir.incr ))
+        else Vector.from(allCardinal.map( dir => p + dir.incr ))
 
     def adjacentCardinal: Vector[(Int, Int)] = adjacent(false)
 }
@@ -199,9 +193,9 @@ object SimpleGrid {
     }
 
     def compareYX(p1: (Int, Int), p2: (Int, Int)): Boolean = {
-        if p1._2 < p2._2 then true
-        else if p1._2 > p2._2 then false
-        else p1._1 < p2._1
+        if p1.y < p2.y then true
+        else if p1.y > p2.y then false
+        else p1.x < p2.x
     }
 }
 
