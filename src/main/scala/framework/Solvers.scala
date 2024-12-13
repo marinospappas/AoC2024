@@ -13,9 +13,10 @@ import solutions.day09.DiskFragmenter
 import solutions.day10.TrailFinder
 import solutions.day11.PebbleTransformation
 import solutions.day12.FenceCalculator
+import solutions.day13.ClawMachinePlayer
 
 val solvers = Map(
     1 -> LocationAnalyser(), 2 -> ReportAnalyser(), 3 -> CorruptedMemoryCleaner(), 4 -> WordSearch(), 5 -> PrintingRules(),
     6 -> MapRouteExplorer(), 7 -> BridgeRepair(), 8 -> AntennaPositionAnalyser(), 9 -> DiskFragmenter(), 10 -> TrailFinder(),
-    11 -> PebbleTransformation(), 12 -> FenceCalculator()
+    11 -> PebbleTransformation(), 12 -> FenceCalculator(), 13 -> ClawMachinePlayer()
 )
