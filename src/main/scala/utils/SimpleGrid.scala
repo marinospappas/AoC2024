@@ -10,6 +10,7 @@ import scala.collection.mutable.ArrayBuffer
 
 open class SimpleGrid(gridData: Vector[String]) {
 
+    //TODO investigate replacing Array with Vector - implication with setDataPoint
     private val data: Array[Array[Char]] = gridData.map (s => s.toCharArray).toArray
     private val maxX: Int = data(0).length - 1
     private val maxY: Int = data.length - 1
@@ -32,8 +33,7 @@ open class SimpleGrid(gridData: Vector[String]) {
         (if (includeDiagonals) p.adjacent() else p.adjacentCardinal).toSet
 
     def getAdjacentValues(p: (Int, Int), includeDiagonals: Boolean = false): Vector[Char] =
-        (if (includeDiagonals) p.adjacent() else p.adjacentCardinal)
-            .map( pos => data(pos.y)(pos.x) )
+        (if (includeDiagonals) p.adjacent() else p.adjacentCardinal).map( pos => data(pos.y)(pos.x) )
 
     def findFirst(d: Char): (Int, Int) = {
         val y = (0 to maxY).find( data(_).contains(d) ).getOrElse(-1)
