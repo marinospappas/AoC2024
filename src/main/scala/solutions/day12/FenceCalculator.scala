@@ -17,24 +17,9 @@ class FenceCalculator extends PuzzleSolver {
 
     val plotsGrid: SimpleGrid = SimpleGrid(InputReader.read(12))
     var allPlots: Vector[(Char, Vector[(Int, Int)])] = Vector()
-    
-    def findAllPlots(grid: SimpleGrid): Vector[(Char, Vector[(Int, Int)])] = {
-        val allPoints = grid.getAllCoordinates
-        val result = ArrayBuffer[(Char, Vector[(Int, Int)])]()
-        val processed = ArrayBuffer[(Int, Int)]()
-        for p <- allPoints do {
-            if !processed.contains(p) then {
-                val datum = grid.getDataPoint(p)
-                val area = grid.getAdjacentArea(p)
-                result += ((datum, area))
-                processed ++= area
-            }
-        }
-        result.toVector
-    }
 
     override def part1: Any = {
-        allPlots = findAllPlots(plotsGrid)
+        allPlots = plotsGrid.findAllAreas
         allPlots.map( plot => (plot._1, plot._2.size, plotsGrid.getPerimeter(plot._2)))
             .foldLeft(0)( (sum, cur) => sum + cur._2 * cur._3 )
     }

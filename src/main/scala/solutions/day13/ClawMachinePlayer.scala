@@ -3,8 +3,7 @@ package solutions.day13
 
 import framework.{InputReader, PuzzleSolver}
 import solutions.day13.ClawMachinePlayer.{PART2_OFFSET, TOKENS_A, TOKENS_B, toClawMachine}
-import utils.GridUtils.Direction.*
-import utils.{Grid, GridBuilder, GridUtils, LinearEqSys, Point}
+import utils.LinearEqSys
 
 class ClawMachinePlayer extends PuzzleSolver {
 

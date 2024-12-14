@@ -2,6 +2,8 @@ package org.mpdev.scala.aoc2024
 package utils
 
 import utils.Grid.*
+
+import java.util
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -131,6 +133,35 @@ open class Grid[T](gridData: Map[Point,T],
         border = gridBorder.toList
     }
 
+    def getAdjacentArea(point: Point): Vector[Point] = {
+        val visited = ArrayBuffer(point)
+        val queue = util.ArrayDeque[Point]()
+        queue.add(point)
+        while !queue.isEmpty do {
+            val current = queue.removeFirst()
+            current.adjacentCardinal().filter(p => getDataPoint(p) == data(point))
+                .foreach(connection =>
+                    if !visited.contains(connection) then {
+                        visited += connection
+                        queue.add(connection)
+                    }
+                )
+        }
+        visited.toVector
+    }
+
+    def findAllAreas: Vector[(T, Vector[Point])] = {
+        val result = ArrayBuffer[(T, Vector[Point])]()
+        val processed = ArrayBuffer[Point]()
+        for p <- data.keys do {
+            if !processed.contains(p) then {
+                val area = getAdjacentArea(p)
+                result += ((data(p), area))
+                processed ++= area
+            }
+        }
+        result.toVector
+    }
 
     private def data2Grid(): Array[Array[String]] =
         val grid: Array[Array[String]] = Array.fill(maxY-minY+1) { Array.fill(maxX-minX+1) { DEFAULT_CHAR.toString } }
@@ -142,23 +173,42 @@ open class Grid[T](gridData: Map[Point,T],
             case i: Int => ('0'.toInt + i % 10).toChar
             case _ => 'x')
 
+    override def toString: String = {
+        val stringGrid = data2Grid()
+        val sb = StringBuilder()
+        for (i <- stringGrid.indices)
+            sb.append(f"${i % 100}%2d ")
+            for (j <- stringGrid.head.indices)
+                sb.append(stringGrid(i)(j))
+            sb.append("\n")
+        sb.append("   ")
+        for (i <- stringGrid.head.indices)
+            sb.append(if (i % 10 == 0) (i / 10) % 10 else " ")
+        sb.append("\n")
+        sb.append("   ")
+        for (i <- stringGrid.head.indices)
+            sb.append(printFormat.format((i % 10).toString.head))
+        sb.append("\n")
+        sb.toString
+    }
+    
     def printIt(): Unit = printGrid(data2Grid())
 
-    private def printGrid(grid: Array[Array[String]]): Unit =
+    private def printGrid(grid: Array[Array[String]]): Unit = {
         for (i <- grid.indices)
-            print(f"${i%100}%2d ")
+            print(f"${i % 100}%2d ")
             for (j <- grid.head.indices)
                 print(grid(i)(j))
             println("")
         print("   ")
         for (i <- grid.head.indices)
-            print(if (i%10 == 0) (i/10)%10 else " ")
+            print(if (i % 10 == 0) (i / 10) % 10 else " ")
         println("")
         print("   ")
         for (i <- grid.head.indices)
-            print(printFormat.format((i%10).toString.head))
+            print(printFormat.format((i % 10).toString.head))
         println("")
-
+    }
 }
 
 object Grid {

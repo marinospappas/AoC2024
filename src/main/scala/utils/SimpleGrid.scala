@@ -68,10 +68,9 @@ open class SimpleGrid(gridData: List[String]) {
         val visited = ArrayBuffer(point)
         val queue = util.ArrayDeque[(Int, Int)]()
         queue.add(point)
-        val value = data(point.y)(point.x)
         while !queue.isEmpty do {
             val current = queue.removeFirst()
-            current.adjacentCardinal.filter( p => isInsideGrid(p) && data(p.y)(p.x) == value )
+            current.adjacentCardinal.filter( p => isInsideGrid(p) && data(p.y)(p.x) == data(point.y)(point.x) )
                 .foreach ( connection =>
                     if !visited.contains(connection) then {
                         visited += connection
@@ -80,6 +79,20 @@ open class SimpleGrid(gridData: List[String]) {
             )
         }
         visited.toVector
+    }
+
+    def findAllAreas: Vector[(Char, Vector[(Int, Int)])] = {
+        val allPoints = getAllCoordinates
+        val result = ArrayBuffer[(Char, Vector[(Int, Int)])]()
+        val processed = ArrayBuffer[(Int, Int)]()
+        for p <- allPoints do {
+            if !processed.contains(p) then {
+                val area = getAdjacentArea(p)
+                result += ((data(p.y)(p.x), area))
+                processed ++= area
+            }
+        }
+        result.toVector
     }
 
     def getPerimeter(area: Vector[(Int, Int)]): Int = {
