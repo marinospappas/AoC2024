@@ -34,19 +34,19 @@ class TestDay12 extends AnyFlatSpec {
 
     it should "identify all plots" in {
         val grid = SimpleGrid(grid1)
-        val plots = solver.findAllPlots(grid)
+        val plots = grid.findAllAreas
         plots.foreach( plot => println(plot._2.sortWith( (p1, p2) => SimpleGrid.compareYX(p1, p2))))
         (plots.size, plots.map(_._2.size).sum) shouldBe (5, grid.getDimensions._1 * grid.getDimensions._2)
     }
 
     it should "calculate perimeter" in {
         val grid = SimpleGrid(grid2)
-        val plots = solver.findAllPlots(grid)
+        val plots = grid.findAllAreas
         val perimeters = plots.map( plot => (plot._1, grid.getPerimeter(plot._2)))
         perimeters.foreach(println)
         perimeters.map(_._2).sum shouldBe 52
     }
-    
+
     private val grid3 = List(
         "EEEEE",
         "EXXXX",
@@ -64,7 +64,7 @@ class TestDay12 extends AnyFlatSpec {
     )
     it should "calculate sides" in {
         val grid = SimpleGrid(grid4)
-        val plots = solver.findAllPlots(grid)
+        val plots = grid.findAllAreas
         val sides = plots.map(plot => (plot._1, grid.getNumberOfSides(plot._2)))
         sides.foreach(println)
         sides.find( _._1 == 'A').get._2 shouldBe 12

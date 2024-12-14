@@ -12,7 +12,7 @@ class TestDay14 extends AnyFlatSpec {
 
     AocMain.environment = "test" +
         ""
-    private val solver = RobotSimulator()
+    private var solver = RobotSimulator()
 
     it should "read input and setup robots" in {
         solver.robots.foreach(println)
@@ -22,18 +22,29 @@ class TestDay14 extends AnyFlatSpec {
 
     it should "calculate robot's movement with time" in {
         val robot = Robot((1, 1), (1, -1))
+        val expected = List(
+            (2,0), (3,3), (0,2), (1,1), (2,0), (3,3), (0,2), (1,1),
+            (2,0), (3,3), (0,2), (1,1), (2,0), (3,3), (0,2), (1,1)
+        )
         RobotSimulator.MAX_X = 3
         RobotSimulator.MAX_Y = 3
-        for i <- 1 to 16 do println(robot.curPos(i))
+        val positions = for i <- 1 to 16 yield robot.curPos(i)
+        println(positions)
+        positions shouldBe expected
     }
 
     it should "calculate robot's current position with time" in {
+        solver = RobotSimulator()
         val robot = Robot((2, 4), (2, -3))
+        val expected = List( (4, 1), (6, 5), (8, 2), (10, 6), (1, 3) )
         println(robot)
-        for i <- 1 to 5 do println(robot.curPos(i))
+        val positions = for i <- 1 to 5 yield robot.curPos(i)
+        println(positions)
+        positions shouldBe expected   
     }
     
     it should "solve part1 correctly" in {
+        solver = RobotSimulator()
         solver.part1 shouldBe 12
     }
         
