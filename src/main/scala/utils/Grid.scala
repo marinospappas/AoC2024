@@ -55,25 +55,7 @@ open class Grid[T](gridData: Map[Point,T],
     def getColumn(x: Int): List[(Point,T)] = data.filter ( _._1.x == x ).toList
 
     def getRow(y: Int): List[(Point,T)] = data.filter ( _._1.y == y ).toList
-
-/*TODO - deal with later (when it is needed)
-    fun getAdjacentArea(p: Point): Set<Point> {
-        val area = mutableSetOf<Point>()
-        val value = data[p] ?: return area
-        val visited = mutableSetOf<Point>()
-        val queue = ArrayDeque<Point>().also { q -> q.add(p) }
-        while (queue.isNotEmpty()) {
-            val point = queue.removeFirst().also { visited.add(it) }
-            area.add(point)
-            point.adjacent(false).filter { data[it] == value }.forEach { adj ->
-                if (!visited.contains(adj))
-                    queue.add(adj)
-            }
-        }
-        return area
-    }
-*/
-
+    
     def getDimensions: (Int, Int) = (maxX-minX+1, maxY-minY+1)
     def getMinMaxXY: (Int, Int, Int, Int) = (minX, maxX, minY, maxY)
     def getCorners: Set[Point] = cornerPoints

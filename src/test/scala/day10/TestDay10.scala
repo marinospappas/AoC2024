@@ -12,8 +12,6 @@ class TestDay10 extends AnyFlatSpec {
 
     AocMain.environment = "none"
 
-    // TODO: tidy up the unit tests
-    
     private val grid1 = List(
         "...0...",
         "...1...",
@@ -27,6 +25,7 @@ class TestDay10 extends AnyFlatSpec {
         val solver = TrailFinder(grid1)
         solver.grid.printIt()
         solver.graph.printIt()
+        (solver.grid.getDimensions, solver.graph.getNodes.size) shouldBe ((7, 7), 16)
     }
 
     private val grid2 = List(
