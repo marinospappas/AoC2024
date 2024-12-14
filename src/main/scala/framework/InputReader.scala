@@ -11,13 +11,12 @@ object InputReader {
         case "test" => "src/test/resources/input/input"
         case "none" => ""
 
-    def read(day: Int, pattern: String = filePattern, extension: String = "txt"): List[String] = {
-        if (pattern.isEmpty)
-            return List()
+    def read(day: Int, pattern: String = filePattern, extension: String = "txt"): Vector[String] = {
+        if pattern.isEmpty then return Vector()
         val name =  f"$pattern$day%02d.$extension"
         val source = fromFile(name)
         try
-            source.getLines().toList
+            source.getLines().toVector
         catch case ex: FileNotFoundException =>
             throw AoCException("Could not process file [" + name + "]" + ex.getMessage)
         finally

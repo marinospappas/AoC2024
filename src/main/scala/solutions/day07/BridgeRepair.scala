@@ -7,7 +7,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class BridgeRepair extends PuzzleSolver {
 
-    val inputData: List[(Long, List[Long])] = InputReader.read(7).map (s => { val (i, l) = parse(s); (i, l) })
+    val inputData: Vector[(Long, List[Long])] = InputReader.read(7).map (s => { val (i, l) = parse(s); (i, l) })
 
     private def matchTwo(n1: Long, n2: Long, expected: Long, part2: Boolean): Boolean =
         n1 + n2 == expected || n1 * n2 == expected || (part2 && (n2.toString + n1.toString).toLong == expected)

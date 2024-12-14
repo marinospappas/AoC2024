@@ -11,7 +11,7 @@ import scala.util.boundary.break
 
 class RobotSimulator extends PuzzleSolver {
 
-    val robots: List[Robot] = InputReader.read(14).map( toRobot )
+    val robots: Vector[Robot] = InputReader.read(14).map( toRobot )
     MAX_X = robots.map( _.initPos.x ).max
     MAX_Y = robots.map( _.initPos.y ).max
 
@@ -21,13 +21,13 @@ class RobotSimulator extends PuzzleSolver {
 
     override def part2: Any = {
         var grid = GridBuilder[Char]().withMapper(Map('X' -> 'X'))
-            .fromPointsArray(robots.map(r => Point(r.initPos.x, r.initPos.y)).toArray).build()
+            .fromPointsList(robots.map(r => Point(r.initPos.x, r.initPos.y))).build()
         if AocMain.environment == "test" then println(grid)
         boundary:
             for i <- 1 to 1_000_000 do {
                 if i % 1000 == 0 then print(".")
                 grid = GridBuilder[Char]().withMapper(Map('X' -> 'X'))
-                    .fromPointsArray(robots.map(r => Point(r.curPos(i).x, r.curPos(i).y)).toArray).build()
+                    .fromPointsList(robots.map(r => Point(r.curPos(i).x, r.curPos(i).y))).build()
                 val maxRobotConcentratedPts = grid.findAllAreas.map( _._2 ).maxBy( _.size )
                 if maxRobotConcentratedPts.size > robots.size / 3 then {
                     println()

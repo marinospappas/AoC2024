@@ -10,7 +10,7 @@ import scala.util.boundary.break
 
 class ReportAnalyser extends PuzzleSolver {
 
-    val reports: List[List[Int]] = InputReader.read(2).map( s => s.transform() )
+    val reports: Vector[List[Int]] = InputReader.read(2).map( s => s.transform() )
 
     override def part1: Any =
         reports.count( r => r.isSafe )

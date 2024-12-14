@@ -15,12 +15,12 @@ case class GridBuilder[T](gridData: Map[Point,T] = Map(),
     def withGridData(gridData: Map[Point,T]): GridBuilder[T] = copy(gridData = gridData)
 
     // IMPORTANT!! requires the mapper to have been set
-    def fromVisualGrid(inputGridVisual: List[String]): GridBuilder[T] = 
+    def fromVisualGrid(inputGridVisual: Vector[String]): GridBuilder[T] = 
         copy(gridData = processInputVisual(inputGridVisual, mapper))
 
-    def fromPointsArray(inputPointsArr: Array[Point]): GridBuilder[T] = copy(gridData = processInputXY(inputPointsArr))
+    def fromPointsList(inputPoints: Vector[Point]): GridBuilder[T] = copy(gridData = processInputPoints(inputPoints))
 
-    def fromXYSetVisual(inputXYSet: Set[String]): GridBuilder[T] = copy(gridData = processInputXY(inputXYSet))
+    def fromXYListVisual(inputXYList: Vector[String]): GridBuilder[T] = copy(gridData = processInputXY(inputXYList))
 
     /* TODO create additional builder methods when needed
     def this(xyList: List[Point], mapper: Map[Char,T] = Map(), border: Int = 1, defaultChar: Char = '.', defaultSize: (Int,Int) = (-1,-1), function: Point => T) =
@@ -49,7 +49,7 @@ case class GridBuilder[T](gridData: Map[Point,T] = Map(),
     def build(): Grid[T] = Grid[T](gridData, mapper, border, defaultChar, defaultSize, printFormat)
 
     // conversion of input data to Map[Point,T]
-    private def processInputVisual(input: List[String], mapper: Map[Char, T]): Map[Point, T] =
+    private def processInputVisual(input: Vector[String], mapper: Map[Char, T]): Map[Point, T] =
         val thisMap = mutable.Map[Point, T]()
         for (y <- input.indices)
             for (x <- input(y).indices)
@@ -57,13 +57,13 @@ case class GridBuilder[T](gridData: Map[Point,T] = Map(),
                     thisMap += (Point(x, y) -> mapper(input(y)(x)))
         thisMap.toMap
         
-    private def processInputXY(input: Array[Point]): Map[Point, T] =
+    private def processInputPoints(input: Vector[Point]): Map[Point, T] =
         val thisMap = mutable.Map[Point, T]()
         for (p <- input)
             thisMap += p -> mapper.values.head
         thisMap.toMap
 
-    private def processInputXY(input: Set[String]): Map[Point, T] =
+    private def processInputXY(input: Vector[String]): Map[Point, T] =
         val thisMap = mutable.Map[Point, T]()
         for (s <- input)
             val coords = s.split(",")

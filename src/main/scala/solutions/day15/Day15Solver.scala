@@ -5,7 +5,7 @@ import framework.{InputReader, PuzzleSolver}
 
 class Day15Solver extends PuzzleSolver {
 
-    val inputData: List[String] = InputReader.read(15)
+    val inputData: Vector[String] = InputReader.read(15)
 
     override def part1: Any =
         ""

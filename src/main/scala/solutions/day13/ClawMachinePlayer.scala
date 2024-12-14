@@ -7,7 +7,7 @@ import utils.LinearEqSys
 
 class ClawMachinePlayer extends PuzzleSolver {
 
-    val machines: List[ClawMachine] = InputReader.read(13).sliding(4, 4).toList.map( toClawMachine )
+    val machines: Vector[ClawMachine] = InputReader.read(13).sliding(4, 4).toVector.map( toClawMachine )
 
     override def part1: Any =
         machines.map( m => LinearEqSys.solve2Long(m.buttonA, m.buttonB, m.prize) ).filter( _ != null )
@@ -33,6 +33,6 @@ object ClawMachinePlayer {
     private def readPrize(s: String): (Int, Int) =
         s match { case s"Prize: X=${p1}, Y=${p2}" => (p1.toInt, p2.toInt) }
 
-    def toClawMachine(l: List[String]): ClawMachine =
+    def toClawMachine(l: Vector[String]): ClawMachine =
         ClawMachine(readButton(l.head), readButton(l(1)), readPrize(l(2)))
 }

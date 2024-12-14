@@ -36,7 +36,7 @@ abstract class AbstractAocVm(instructionList: List[String], val instanceNamePref
     protected def aocCtl(programId: Int, cmd: AocCmd, value: Any): Unit =
         ;
         // todo: cmd match
-        //           case AocCmd.SET_OUTPUT_BUFFER_SIZE => instanceTable(progarmId).ioChannels(1) = Channel(value.asInstanceOf[Int])
+        //           case AocCmd.SET_OUTPUT_BUFFER_SIZE => instanceTable(programId).ioChannels(1) = Channel(value.asInstanceOf[Int])
 
     /// protected / internal functions
     def runAocProgram(programId: Int, initReg: Map[String, Long] = Map()): Future[Int] =

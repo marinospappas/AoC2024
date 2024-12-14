@@ -8,9 +8,9 @@ import java.util
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-open class SimpleGrid(gridData: List[String]) {
+open class SimpleGrid(gridData: Vector[String]) {
 
-    private val data: Array[Array[Char]] = gridData.toArray.map (s => s.toCharArray)
+    private val data: Array[Array[Char]] = gridData.map (s => s.toCharArray).toArray
     private val maxX: Int = data(0).length - 1
     private val maxY: Int = data.length - 1
 
@@ -21,7 +21,7 @@ open class SimpleGrid(gridData: List[String]) {
     
     def setDataPoint(p: (Int, Int), d: Char): Unit = data(p.y)(p.x) = d
 
-    def getDataPoints: Array[Array[Char]] = data
+    def getDataPoints: Vector[Vector[Char]] = data.map(_.toVector).toVector
 
     def getDataValues: Set[Char] = data.flatten.toSet
 
@@ -31,9 +31,9 @@ open class SimpleGrid(gridData: List[String]) {
     def getAdjacent(p: (Int, Int), includeDiagonals: Boolean = false): Set[(Int, Int)] =
         (if (includeDiagonals) p.adjacent() else p.adjacentCardinal).toSet
 
-    def getAdjacentValues(p: (Int, Int), includeDiagonals: Boolean = false): List[Char] =
+    def getAdjacentValues(p: (Int, Int), includeDiagonals: Boolean = false): Vector[Char] =
         (if (includeDiagonals) p.adjacent() else p.adjacentCardinal)
-            .map( pos => data(pos.y)(pos.x) ).toList
+            .map( pos => data(pos.y)(pos.x) )
 
     def findFirst(d: Char): (Int, Int) = {
         val y = (0 to maxY).find( data(_).contains(d) ).getOrElse(-1)
@@ -47,9 +47,9 @@ open class SimpleGrid(gridData: List[String]) {
             if data(y)(x) == d
         } yield (x, y)).toSet
 
-    def getColumn(x: Int): List[Char] = (0 to maxY).map( data(x)(_)).toList
+    def getColumn(x: Int): Vector[Char] = (0 to maxY).map( data(x)(_)).toVector
 
-    def getRow(y: Int): List[Char] = data(y).toList
+    def getRow(y: Int): Vector[Char] = data(y).toVector
 
     def getDimensions: (Int, Int) = (maxX+1, maxY+1)
 
@@ -115,7 +115,7 @@ open class SimpleGrid(gridData: List[String]) {
         var prevEdges = Set[(Int, Direction)]()
         ptsGrouped.map( _._2 ).foreach(g =>
             val thisEdges = Set((g.head.x, W)) ++ Set((g.last.x + 1, E)) ++
-                g.map(_.x).sliding(2).toList.filter( x => x.size > 1 && x.head + 1 != x(1)).flatMap( x => Set((x.head + 1, E), (x(1), W)) ).toSet
+                g.map(_.x).sliding(2).filter( x => x.size > 1 && x.head + 1 != x(1)).flatMap( x => Set((x.head + 1, E), (x(1), W)) ).toSet
             numberOfEdges += (
                 if prevEdges.isEmpty then thisEdges.size 
                 else thisEdges.size - thisEdges.intersect(prevEdges).size

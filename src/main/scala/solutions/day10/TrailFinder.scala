@@ -5,7 +5,7 @@ import framework.{AocMain, InputReader, PuzzleSolver}
 import utils.{Bfs, Graph, Point, SimpleGrid, x, y}
 import solutions.day10.TrailFinder.{TRAIL_END, TRAIL_START, initGraph}
 
-class TrailFinder(var testData: List[String] = List()) extends PuzzleSolver {
+class TrailFinder(var testData: Vector[String] = Vector()) extends PuzzleSolver {
 
     val grid: SimpleGrid = SimpleGrid(if (testData.nonEmpty) testData else InputReader.read(10))
     val graph: Graph[(Int, Int, Char)] = initGraph(grid)
