@@ -15,7 +15,7 @@ class TestDay13 extends AnyFlatSpec {
     private val solver = ClawMachinePlayer()
 
     it should "read input and setup claw machines" in {
-        solver.machines.foreach(println(_))
+        solver.machines.foreach(println)
         solver.machines.size shouldBe 4
     }
 

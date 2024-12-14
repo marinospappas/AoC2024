@@ -208,10 +208,11 @@ object SimpleGrid {
         def allDirections: Set[Direction] = allCardinal ++ Set(NE, SE, SW, NW)
     }
 
-    def compareYX(p1: (Int, Int), p2: (Int, Int)): Boolean = {
-        if p1.y < p2.y then true
-        else if p1.y > p2.y then false
-        else p1.x < p2.x
+    def compareYX(point1: (Int, Int), point2: (Int, Int)): Boolean = {
+        (point1, point2) match
+            case (p1, p2) if p1.y < p2.y => true
+            case (p1, p2) if p1.y > p2.y => false
+            case (p1, p2) => p1.x < p2.x
     }
 }
 

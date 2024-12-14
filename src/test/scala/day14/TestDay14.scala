@@ -40,9 +40,9 @@ class TestDay14 extends AnyFlatSpec {
         println(robot)
         val positions = for i <- 1 to 5 yield robot.curPos(i)
         println(positions)
-        positions shouldBe expected   
+        positions shouldBe expected
     }
-    
+
     it should "solve part1 correctly" in {
         solver = RobotSimulator()
         solver.part1 shouldBe 12

@@ -13,9 +13,9 @@ case class Robot(initPos: (Int, Int), velocity: (Int, Int)) {
         (moveInOneDim(initPos.x, velocity.x, time, RobotSimulator.MAX_X), moveInOneDim(initPos.y, velocity.y, time, RobotSimulator.MAX_Y))
     
     private def moveInOneDim(p: Int, v: Int, t: Int, max: Int): Int = {
-        var newP = p + v.sign * (t * abs(v)) % (max + 1) 
-        if newP > max then newP -= (max + 1)
-        if newP < 0 then newP = max + 1 + newP
-        newP
+        p + v.sign * (t * abs(v)) % (max + 1) match
+            case newP if newP > max => newP - (max + 1)
+            case newP if newP < 0 => max + 1 + newP
+            case newP => newP
     }
 }

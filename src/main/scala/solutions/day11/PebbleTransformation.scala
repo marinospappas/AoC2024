@@ -2,7 +2,7 @@ package org.mpdev.scala.aoc2024
 package solutions.day11
 
 import framework.{AocMain, InputReader, PuzzleSolver}
-import solutions.day11.PebbleTransformation.Stone.{EVEN_DIGITS, ODD_DIGITS, START, ZERO}
+import solutions.day11.PebbleTransformation.Stone.{EVEN_DIGITS, ODD_DIGITS, ZERO}
 import solutions.day11.PebbleTransformation.Stone
 
 import scala.collection.{immutable, mutable}
@@ -14,7 +14,6 @@ class PebbleTransformation extends PuzzleSolver {
 
     def getNextStones(stone: Stone): List[Stone] = {
         stone match
-            case START => inputData
             case ZERO => List(Stone.ODD_DIGITS("1"))
             case EVEN_DIGITS(number) => number.splitAt(number.length / 2).toList.map(_.toLong.toString).map(Stone.fromString)
             case ODD_DIGITS(number) => List(Stone.fromString((number.toLong * 2024).toString))
@@ -47,7 +46,6 @@ class PebbleTransformation extends PuzzleSolver {
 
 object PebbleTransformation {
     enum Stone {
-        case START
         case ZERO
         case EVEN_DIGITS(num: String)
         case ODD_DIGITS(num: String)

@@ -12,11 +12,12 @@ class BridgeRepair extends PuzzleSolver {
     private def matchTwo(n1: Long, n2: Long, expected: Long, part2: Boolean): Boolean =
         n1 + n2 == expected || n1 * n2 == expected || (part2 && (n2.toString + n1.toString).toLong == expected)
 
-    private def matchListDp(l: List[Long], expected: Long, part2: Boolean = false): Boolean = {
-        if l.size == 2 then matchTwo(l.head, l(1), expected, part2)
-        else expected > l.head && matchListDp(l.slice(1, l.size), expected - l.head, part2)
-            || expected % l.head == 0 && matchListDp(l.slice(1, l.size), expected / l.head, part2)
-            || part2 && expected.toString.length > l.head.toString.length && expected.toString.endsWith(l.head.toString)
+    private def matchListDp(list: List[Long], expected: Long, part2: Boolean = false): Boolean = {
+        list match
+            case l if l.size == 2 => matchTwo(l.head, l(1), expected, part2)
+            case l => expected > l.head && matchListDp(l.slice(1, l.size), expected - l.head, part2)
+                || expected % l.head == 0 && matchListDp(l.slice(1, l.size), expected / l.head, part2)
+                || part2 && expected.toString.length > l.head.toString.length && expected.toString.endsWith(l.head.toString)
                 && matchListDp(l.slice(1, l.size), expected.toString.substring(0, expected.toString.length - l.head.toString.length).toLong, part2)
     }
 

@@ -1,7 +1,7 @@
 package org.mpdev.scala.aoc2024
 package solutions.day14
 
-import framework.{InputReader, PuzzleSolver}
+import framework.{AocMain, InputReader, PuzzleSolver}
 import utils.*
 import solutions.day14.RobotSimulator.{MAX_X, MAX_Y, getQuarter, toRobot}
 
@@ -20,23 +20,19 @@ class RobotSimulator extends PuzzleSolver {
             .foldLeft(1L)((prod, cur) => prod * cur.toLong)
 
     override def part2: Any = {
-        var grid = GridBuilder[Char]()
-            .withMapper(Map('X' -> 'X'))
-            .fromPointsArray(robots.map(r => Point(r.initPos.x, r.initPos.y)).toArray)
-            .build()
-        println(grid)
+        var grid = GridBuilder[Char]().withMapper(Map('X' -> 'X'))
+            .fromPointsArray(robots.map(r => Point(r.initPos.x, r.initPos.y)).toArray).build()
+        if AocMain.environment == "test" then println(grid)
         boundary:
             for i <- 1 to 1_000_000 do {
                 if i % 1000 == 0 then print(".")
-                grid = GridBuilder[Char]()
-                    .withMapper(Map('X' -> 'X'))
-                    .fromPointsArray(robots.map(r => Point(r.curPos(i).x, r.curPos(i).y)).toArray)
-                    .build()
+                grid = GridBuilder[Char]().withMapper(Map('X' -> 'X'))
+                    .fromPointsArray(robots.map(r => Point(r.curPos(i).x, r.curPos(i).y)).toArray).build()
                 val maxRobotConcentratedPts = grid.findAllAreas.map( _._2 ).maxBy( _.size )
-                if maxRobotConcentratedPts.size > robots.size / 4 then {
+                if maxRobotConcentratedPts.size > robots.size / 3 then {
                     println()
                     println(grid)
-                    println(s"number of robots in tree: ${maxRobotConcentratedPts.size}")
+                    println(s"Number of robots in Xmas tree: ${maxRobotConcentratedPts.size}")
                     break(i)
                 }
             }
@@ -49,14 +45,16 @@ object RobotSimulator {
     var MAX_X = 0
     var MAX_Y = 0
 
-    def getQuarter(p: (Int, Int)): Int = {
+    def getQuarter(point: (Int, Int)): Int = {
         val midX = MAX_X / 2
         val midY = MAX_Y / 2
-        if p.y < midY then {
-            if p.x < midX then 0 else if p.x > midX then 1 else -1
-        } else if p.y > midY then {
-            if p.x < midX then 2 else if p.x > midX then 3 else -1
-        } else -1
+        point match {
+            case p if p.x < midX && p.y < midY => 0
+            case p if p.x > midX && p.y < midY => 1
+            case p if p.x < midX && p.y > midY => 2
+            case p if p.x > midX && p.y > midY => 3
+            case _ => -1
+        }
     }
 
     // input parsing
