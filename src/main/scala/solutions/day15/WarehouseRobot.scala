@@ -2,7 +2,7 @@ package org.mpdev.scala.aoc2024
 package solutions.day15
 
 import framework.{AocMain, InputReader, PuzzleSolver}
-import solutions.day15.WarehouseRobot.{EMPTY, GOODS, GOODS_LEFT_EDGE, ROBOT, WALL, doubleWidth, moveRobot, moveRobot2}
+import solutions.day15.WarehouseRobot.{EMPTY, GOODS, GOODS_LEFT_EDGE, ROBOT, WALL, doubleWidth, moveRobot}
 import utils.{+, SimpleGrid, x, y, *}
 import utils.SimpleGrid.Direction
 import utils.SimpleGrid.Direction.*
@@ -29,7 +29,7 @@ class WarehouseRobot extends PuzzleSolver {
     val robotPos2: (Int, Int) = warehouse2.findFirst(ROBOT)
 
     override def part2: Any = {
-        moveRobot2(warehouse2, robotPos2, directions)
+        moveRobot(warehouse2, robotPos2, directions, part1 = false)
         println(warehouse2)
         warehouse2.findAll(GOODS_LEFT_EDGE).map( p => 100 * p.y + p.x ).sum
     }
@@ -52,6 +52,10 @@ object WarehouseRobot {
             case EMPTY => ".."
             case ROBOT => "@."
 
+    def pushItems(grid: SimpleGrid, curPos: (Int, Int), direction: Direction, part1: Boolean = false): Boolean =
+        if part1 then pushNarrowItems(grid, curPos, direction)
+        else pushWideItems(grid, curPos, direction)
+        
     def pushNarrowItems(grid: SimpleGrid, curPos: (Int, Int), direction: Direction): Boolean = {
         curPos + direction.incr match
             case p if grid.getDataPoint(p) == EMPTY =>
@@ -130,30 +134,17 @@ object WarehouseRobot {
                 else false
     }
 
-    def moveRobot(grid: SimpleGrid, startPos: (Int, Int), directions: Vector[Direction]): Unit = {
+    def moveRobot(grid: SimpleGrid, startPos: (Int, Int), directions: Vector[Direction], part1: Boolean = true): Unit = {
         var curPos = startPos
         grid.setDataPoint(curPos, EMPTY)
         for d <- directions do {
             curPos + d.incr match
                 case p if grid.getDataPoint(p) == WALL => ;
-                case p if grid.getDataPoint(p) == GOODS => if pushNarrowItems(grid, p, d) then curPos = p
+                case p if Set(GOODS, GOODS_LEFT_EDGE, GOODS_RIGHT_EDGE).contains(grid.getDataPoint(p)) => 
+                    if pushItems(grid, p, d, part1) then curPos = p
                 case p => curPos = p
         }
         grid.setDataPoint(curPos, ROBOT)
-    }
-
-    def moveRobot2(grid: SimpleGrid, startPos: (Int, Int), directions: Vector[Direction]): Unit = {
-        var curPos = startPos
-        var n = 0
-        for d <- directions do {
-            grid.setDataPoint(curPos, EMPTY)
-            curPos + d.incr match
-                case p if grid.getDataPoint(p) == WALL => ;
-                case p if Set(GOODS_LEFT_EDGE, GOODS_RIGHT_EDGE).contains(grid.getDataPoint(p)) => if pushWideItems(grid, p, d) then curPos = p
-                case p => curPos = p
-            grid.setDataPoint(curPos, ROBOT)
-            if AocMain.environment == "test" then { println(n); println(grid.stringWithoutRowColIndx) }
-            n += 1
-        }
+        if AocMain.environment == "test" then println(grid.stringWithoutRowColIndx)
     }
 }
