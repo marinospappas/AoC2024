@@ -16,6 +16,8 @@ open class SimpleGrid(gridData: Vector[String]) {
     private val maxX: Int = data(0).length - 1
     private val maxY: Int = data.length - 1
 
+    override def clone = SimpleGrid(Vector.from(data.map( _.mkString )))
+        
     def getDataPoint(p: (Int, Int)): Char = data(p._2)(p._1)
 
     def getDataPointOrNull(p: (Int, Int)): Char | Null =
@@ -146,6 +148,12 @@ open class SimpleGrid(gridData: Vector[String]) {
         sb.append((for i <- data.indices yield f"${i % 100}%2d " + data(i).mkString).mkString("\n"))
         sb.append("\n   " + data.head.indices.map(x => if x % 10 == 0 then ((x / 10) % 10).toString else " ").mkString)
         sb.append("\n   " + data.head.indices.map(x => (x % 10).toString).mkString)
+        sb.toString()
+    }
+    
+    def stringWithoutRowColIndx: String = {
+        val sb = StringBuilder()
+        sb.append((for i <- data.indices yield data(i).mkString).mkString("\n"))
         sb.toString()
     }
     
