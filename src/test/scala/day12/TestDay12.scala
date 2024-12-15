@@ -18,13 +18,13 @@ class TestDay12 extends AnyFlatSpec {
         (solver.plotsGrid.getDimensions, solver.plotsGrid.getAllCoordinates.size) shouldBe ((10, 10), 100)
     }
 
-    private val grid1 = List(
+    private val grid1 = Vector(
         "AAAA",
         "BBCD",
         "BBCC",
         "EEEC"
     )
-    private val grid2 = List(
+    private val grid2 = Vector(
         "OOOOO",
         "OXOXO",
         "OOOOO",
@@ -47,14 +47,14 @@ class TestDay12 extends AnyFlatSpec {
         perimeters.map(_._2).sum shouldBe 52
     }
 
-    private val grid3 = List(
+    private val grid3 = Vector(
         "EEEEE",
         "EXXXX",
         "EEEEE",
         "EXXXX",
         "EEEEE"
     )
-    private val grid4 = List(
+    private val grid4 = Vector(
         "AAAAAA",
         "AAA..A",
         "AAA..A",

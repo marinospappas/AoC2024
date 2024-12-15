@@ -3,6 +3,7 @@ package utils
 
 import utils.SimpleGrid.Direction
 import utils.SimpleGrid.Direction.*
+import framework.AoCException
 
 import java.util
 import scala.collection.mutable
@@ -206,6 +207,9 @@ object SimpleGrid {
         def allCardinal: Set[Direction] = Set(N, E, S, W)
 
         def allDirections: Set[Direction] = allCardinal ++ Set(NE, SE, SW, NW)
+        
+        def fromArrow(arrow: Char): Direction =
+            Direction.values.find(d => d.symbol == arrow).getOrElse(throw AoCException(s"invalid direction [$arrow]"))
     }
 
     def compareYX(point1: (Int, Int), point2: (Int, Int)): Boolean = {

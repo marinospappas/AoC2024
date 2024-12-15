@@ -12,7 +12,7 @@ class TestDay10 extends AnyFlatSpec {
 
     AocMain.environment = "none"
 
-    private val grid1 = List(
+    private val grid1 = Vector(
         "...0...",
         "...1...",
         "...2...",
@@ -28,7 +28,7 @@ class TestDay10 extends AnyFlatSpec {
         (solver.grid.getDimensions, solver.graph.getNodes.size) shouldBe ((7, 7), 16)
     }
 
-    private val grid2 = List(
+    private val grid2 = Vector(
         "10..9..",
         "2...8..",
         "3...7..",
@@ -45,7 +45,7 @@ class TestDay10 extends AnyFlatSpec {
         result shouldBe 36
     }
 
-    private val grid3 = List(
+    private val grid3 = Vector(
         ".....0.",
         "..4321.",
         "..5..2.",

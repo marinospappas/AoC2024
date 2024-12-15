@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers.*
 
 class TestGrid extends AnyFlatSpec {
 
-    private val inputString = List(
+    private val inputString = Vector(
         "012",
         "345",
         "678"
