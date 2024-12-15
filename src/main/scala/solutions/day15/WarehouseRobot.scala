@@ -30,7 +30,6 @@ class WarehouseRobot extends PuzzleSolver {
 
     override def part2: Any = {
         moveRobot(warehouse2, robotPos2, directions, part1 = false)
-        println(warehouse2)
         warehouse2.findAll(GOODS_LEFT_EDGE).map( p => 100 * p.y + p.x ).sum
     }
 }
@@ -55,7 +54,7 @@ object WarehouseRobot {
     def pushItems(grid: SimpleGrid, curPos: (Int, Int), direction: Direction, part1: Boolean = false): Boolean =
         if part1 then pushNarrowItems(grid, curPos, direction)
         else pushWideItems(grid, curPos, direction)
-        
+
     def pushNarrowItems(grid: SimpleGrid, curPos: (Int, Int), direction: Direction): Boolean = {
         curPos + direction.incr match
             case p if grid.getDataPoint(p) == EMPTY =>
@@ -74,22 +73,6 @@ object WarehouseRobot {
     def pushWideItems(grid: SimpleGrid, curPos: (Int, Int), direction: Direction): Boolean =
         if Set(E, W).contains(direction) then pushWideItemsHoriz(grid, curPos, direction)
         else pushWideItemsVert(grid, curPos, direction)
-
-    def isEmpty(grid: SimpleGrid, point: (Int, Int), direction: Direction): Boolean = {
-        direction match
-            case d if Set(E, W).contains(d) => grid.getDataPoint(point + d.incr * 2) == EMPTY
-            case d => // N, S
-                grid.getDataPoint(point + direction.incr) == EMPTY &&
-                    grid.getDataPoint((point + otherEdge(grid.getDataPoint(point))) + direction.incr) == EMPTY
-    }
-
-    def isWall(grid: SimpleGrid, point: (Int, Int), direction: Direction): Boolean = {
-        direction match
-            case d if Set(E, W).contains(d) => grid.getDataPoint(point + d.incr * 2) == WALL
-            case d => // N, S
-                grid.getDataPoint(point + direction.incr) == WALL ||
-                    grid.getDataPoint((point + otherEdge(grid.getDataPoint(point))) + direction.incr) == WALL
-    }
 
     private def pushWideItemsHoriz(grid: SimpleGrid, curPos: (Int, Int), direction: Direction): Boolean = {
         val goodsPos = (curPos, curPos + otherEdge(grid.getDataPoint(curPos)))
@@ -140,7 +123,7 @@ object WarehouseRobot {
         for d <- directions do {
             curPos + d.incr match
                 case p if grid.getDataPoint(p) == WALL => ;
-                case p if Set(GOODS, GOODS_LEFT_EDGE, GOODS_RIGHT_EDGE).contains(grid.getDataPoint(p)) => 
+                case p if Set(GOODS, GOODS_LEFT_EDGE, GOODS_RIGHT_EDGE).contains(grid.getDataPoint(p)) =>
                     if pushItems(grid, p, d, part1) then curPos = p
                 case p => curPos = p
         }
