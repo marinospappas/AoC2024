@@ -151,12 +151,8 @@ object WarehouseRobot {
                 case p if grid.getDataPoint(p) == WALL => ;
                 case p if Set(GOODS_LEFT_EDGE, GOODS_RIGHT_EDGE).contains(grid.getDataPoint(p)) => if pushWideItems(grid, p, d) then curPos = p
                 case p => curPos = p
-                
-                case p if isEmpty(grid, p, d) => curPos = p + d.incr
-                case p if isWall(grid, p, d) => ;
-                case p => if pushWideItems(grid, p, d) then curPos = p + d.incr
             grid.setDataPoint(curPos, ROBOT)
-            if AocMain.environment == "test" then println(n); println(grid.stringWithoutRowColIndx)
+            if AocMain.environment == "test" then { println(n); println(grid.stringWithoutRowColIndx) }
             n += 1
         }
     }
