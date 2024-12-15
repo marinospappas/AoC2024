@@ -176,7 +176,7 @@ class TestDay15 extends AnyFlatSpec {
         val grid = SimpleGrid(w2)
         val directions = "<vv<<^^<<^^".map(Direction.fromArrow).toVector
         println(grid)
-        WarehouseRobot.moveRobot2(grid, grid.findFirst(ROBOT), directions)
+        WarehouseRobot.moveRobot(grid, grid.findFirst(ROBOT), directions, part1 = false)
         println(grid)
         grid.getDataPoints shouldBe SimpleGrid(afterShifting3).getDataPoints
     }
@@ -197,6 +197,6 @@ class TestDay15 extends AnyFlatSpec {
         println(solver.warehouse2)
         val result = solver.part2
         println(solver.warehouse2)
-        (result, solver.warehouse.getDataPoints) shouldBe(9021, SimpleGrid(afterShifting4).getDataPoints)
+        (result, solver.warehouse2.getDataPoints) shouldBe(9021, SimpleGrid(afterShifting4).getDataPoints)
     }
 }
