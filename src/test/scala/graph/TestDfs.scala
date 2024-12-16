@@ -1,7 +1,7 @@
 package org.mpdev.scala.aoc2024
 package graph
 
-import utils.{Djikstra, Graph}
+import utils.{DjikstraV0, Graph}
 import org.mpdev.scala.aoc2015.utils.Dfs
 
 import org.scalatest.flatspec.AnyFlatSpec

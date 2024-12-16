@@ -1,7 +1,7 @@
 package org.mpdev.scala.aoc2024
 package graph
 
-import utils.{Djikstra, Graph}
+import utils.{DjikstraV0, Graph}
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,7 +25,7 @@ class TestDjikstra extends AnyFlatSpec {
     }
 
     it should "find minimum path in simple graph" in {
-        val result = Djikstra[String](graph).minPath("1", id => id == "7")
+        val result = DjikstraV0[String](graph).minPath("1", id => id == "7")
         result.printPath()
         (result.minCost, result.path.size) shouldBe (7, 5)
     }

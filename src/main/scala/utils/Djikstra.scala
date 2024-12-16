@@ -4,13 +4,15 @@ package utils
 import framework.AoCException
 
 import java.util.PriorityQueue
+import java.util.ArrayDeque
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.boundary
 import boundary.break
-
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import java.util
 
 class Djikstra[T](g: Graph[T]) {
 
@@ -18,74 +20,77 @@ class Djikstra[T](g: Graph[T]) {
 
     Graph.aStarAlgorithm = false // ensure dijkstra is used
 
+    private val distFromStart: mutable.Map[T, Int] = mutable.Map()
+    private val predecessors: mutable.Map[T, ArrayBuffer[T]] = mutable.Map()
+    val visited: ArrayBuffer[PathNode[T]] = ArrayBuffer()
+    var iterations = 0
+
+    def allPaths(start: T, isAtEnd: T => Boolean): Vector[Vector[(T, Int)]] = {
+        allPaths(start)
+        getPaths(start, t => isAtEnd(t))
+    }
+
     /**
-     * Dijkstra algorithm
+     * Dijkstra algorithm for All Paths
      */
-    def minPath(start: T, isAtEnd: T => Boolean): MinCostPath[T] = {
+    private def allPaths(start: T): Unit = {
 
-        val priorityQueue = PriorityQueue[GraphPathNode[T]]()
-        priorityQueue.add(GraphPathNode(start))
-        val visited = ArrayBuffer[GraphPathNode[T]]()
-        val dijkstraCost = GraphPathMap[T]()
-        var currentNode: GraphPathNode[T] = GraphPathNode()
+        val priorityQueue = PriorityQueue[PathNode[T]]()
+        distFromStart.clear()
+        predecessors.clear()
+        visited.clear()
+        distFromStart.put(start, 0)
+        predecessors.put(start, ArrayBuffer())
+        iterations = 0
 
-        var iterations = 0
+        priorityQueue.add(PathNode(start, 0))
         // while the priority Q has elements, get the top one (least cost as per Comparator)
         while (!priorityQueue.isEmpty) {
-            currentNode = priorityQueue.poll()
-            val currentNodeId: T = currentNode.id.asInstanceOf[T]
-            // if this is the endNode ID, we are done
-            if (isAtEnd(currentNodeId)) {
-                val minCostPath = MinCostPath[T] ()
-                minCostPath.minCost = currentNode.costFromStart
-                minCostPath.numberOfIterations = iterations
-                minCostPath.path = dijkstraCost.getMinCostPath(currentNodeId, start)
-                return minCostPath
-            }
+            val pathNode = priorityQueue.poll()
+            val (curNode, curDistance) = (pathNode._1.asInstanceOf[T], pathNode._2)
             boundary:
-                log.trace(s"> connected nodes for node $currentNodeId")
-                for (connectedNode <- g.getConnected(currentNodeId)) do
-                    log.trace(s">>      $connectedNode")
-                    val nextPathNode = GraphPathNode(connectedNode._1, connectedNode._2)
-                    if (visited.contains(nextPathNode))
-                        break()
+                log.trace(s"> connected nodes for node $curNode")
+                for connectedNode <- g.getConnected(curNode).filter( _._1 != start) do {
+                    val nextPathNode = PathNode(connectedNode._1, connectedNode._2)
+                    //if (visited.contains(nextPathNode))
+                    //    break()
                     iterations += 1
                     visited += nextPathNode
-                    // calculate the new cost to that node and the new *estimated* total cost to the end node
-                    val newCost = currentNode.costFromStart + connectedNode._2
-                    // if the new cost is less than what we have already recorded in the map of nodes/costs
-                    // update the map with the new costs and "updatedBy" (to be able to back-track the min.cost path)
-                    if (newCost < dijkstraCost.pathMap(connectedNode._1).costFromStart)
-                        nextPathNode.updatedBy = currentNode.id
-                            nextPathNode.costFromStart = newCost
-                        dijkstraCost.pathMap(connectedNode._1) = nextPathNode
-                        // and put the updated new node back into the priority queue
-                        priorityQueue.add(nextPathNode)
+                    val totalDistance = curDistance + connectedNode._2
+                    if totalDistance < distFromStart.getOrElse(connectedNode._1, Int.MaxValue) then {
+                        distFromStart(connectedNode._1) = totalDistance
+                        predecessors(connectedNode._1) = ArrayBuffer(curNode)
+                        priorityQueue.add(PathNode(connectedNode._1, totalDistance))
+                    } else
+                        predecessors(connectedNode._1) = predecessors.getOrElse(connectedNode._1, ArrayBuffer()) :+ curNode
+                }
         }
-        //dijkstraCost.pathMap.foreach( println(_) )
-        throw AoCException(s"no path found from $start to endState")
+    }
+
+    private def getPaths(start: T, isAtEnd: T => Boolean): Vector[Vector[(T, Int)]] = {
+        val end = predecessors.keys.find(isAtEnd(_)).get
+        val allPaths = ArrayBuffer[ArrayBuffer[(T, Int)]]()
+        val queue = util.ArrayDeque[ArrayBuffer[(T, Int)]]()
+        var curPath = ArrayBuffer[(T, Int)]((end, distFromStart(end)))
+        queue.add(curPath)
+        while !queue.isEmpty do {
+            curPath = queue.poll()
+            val lastNode = curPath.last
+            if lastNode._1 == start then
+                allPaths += curPath
+            else
+                predecessors(lastNode._1).foreach(predecessor =>
+                    if !curPath.contains(predecessor) && lastNode._2 > distFromStart(predecessor) then {
+                        val newPartialPath = curPath.to(ArrayBuffer)
+                        newPartialPath += ((predecessor, distFromStart(predecessor)))
+                        queue.add(newPartialPath)
+                    }
+                )
+        }
+        allPaths.map( _.toVector ).toVector
     }
 }
 
-case class GraphPathNode[T](id: T | Null = null, var costFromStart: Int = 0, var updatedBy: T | Null = null) extends Comparable[GraphPathNode[T]] {
-    private val estTotalCostToEnd: Int = Int.MaxValue    // used in A* algorithm only
-    override def compareTo(other: GraphPathNode[T]): Int =
-        if (!Graph.aStarAlgorithm)    // in Dijkstra min cost criteria is based on cost from start to this node
-            costFromStart.compareTo(other.costFromStart)
-        else   // in A* min cost criteria is based on est total cost from start to end
-            estTotalCostToEnd.compareTo(other.estTotalCostToEnd)
-}
-
-case class GraphPathMap[T](pathMap: mutable.Map[T, GraphPathNode[T]] = mutable.Map[T, GraphPathNode[T]]().withDefaultValue(GraphPathNode(null, Int.MaxValue))) {
-    def getMinCostPath(minCostKey: T, startKey: T): List[(T, Int)] =
-        var key: T = minCostKey
-        val path: ArrayBuffer[(T, Int)] = ArrayBuffer()
-        while ( {
-            val node = pathMap(key)
-            path += ((key, node.costFromStart))
-            key = if (node.updatedBy == null) startKey else node.updatedBy.asInstanceOf[T]
-            key != startKey
-        }) {}
-        path += ((key, 0))
-        path.toList.reverse
+case class PathNode[T](id: T | Null = null, var costFromStart: Int = 0) extends Comparable[PathNode[T]] {
+    override def compareTo(other: PathNode[T]): Int = costFromStart.compareTo(other.costFromStart)
 }

@@ -53,7 +53,7 @@ class Bfs[T](g: Graph[T]) {
 
     def traverseGraph (start: T, f: T => Unit): Unit = {
         val queue = util.ArrayDeque[T]()
-        var curPath = ArrayBuffer[T](start)
+        queue.add(start)
         val visited = mutable.Set[T](start)
         while !queue.isEmpty do {
             val current = queue.removeFirst()

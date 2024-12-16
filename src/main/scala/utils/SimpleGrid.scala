@@ -17,7 +17,7 @@ open class SimpleGrid(gridData: Vector[String]) {
     private val maxY: Int = data.length - 1
 
     override def clone = SimpleGrid(Vector.from(data.map( _.mkString )))
-        
+
     def getDataPoint(p: (Int, Int)): Char = data(p._2)(p._1)
 
     def getDataPointOrNull(p: (Int, Int)): Char | Null =
@@ -28,6 +28,16 @@ open class SimpleGrid(gridData: Vector[String]) {
     def getDataPoints: Vector[Vector[Char]] = data.map(_.toVector).toVector
 
     def getDataValues: Set[Char] = data.flatten.toSet
+
+    def moveDataPoints(points: Vector[(Int, Int)], direction: Direction, steps: Int, replacement: Char): Unit = {
+        val dataValues = points.map( p => data(p.y)(p.x) )
+        val nesPoints = points.map( _ + direction.incr * steps )
+        points.indices.foreach( i =>
+            val newP = points(i) + direction.incr * steps
+            data(newP.y)(newP.x) = dataValues(i)
+            // TODO: complete this function
+        )
+    }
 
     def getAllCoordinates: Vector[(Int, Int)] =
         (for x <- 0 to maxX; y <- 0 to maxY yield (x, y)).toVector
@@ -120,11 +130,11 @@ open class SimpleGrid(gridData: Vector[String]) {
             val thisEdges = Set((g.head.x, W)) ++ Set((g.last.x + 1, E)) ++
                 g.map(_.x).sliding(2).filter( x => x.size > 1 && x.head + 1 != x(1)).flatMap( x => Set((x.head + 1, E), (x(1), W)) ).toSet
             numberOfEdges += (
-                if prevEdges.isEmpty then thisEdges.size 
+                if prevEdges.isEmpty then thisEdges.size
                 else thisEdges.size - thisEdges.intersect(prevEdges).size
-            )  
+            )
             prevEdges = Set.from(thisEdges)
-        ) 
+        )
         numberOfEdges
     }
 
@@ -150,13 +160,13 @@ open class SimpleGrid(gridData: Vector[String]) {
         sb.append("\n   " + data.head.indices.map(x => (x % 10).toString).mkString)
         sb.toString()
     }
-    
+
     def stringWithoutRowColIndx: String = {
         val sb = StringBuilder()
         sb.append((for i <- data.indices yield data(i).mkString).mkString("\n"))
         sb.toString()
     }
-    
+
     def printIt(): Unit = println(this.toString)
 }
 
@@ -215,7 +225,7 @@ object SimpleGrid {
         def allCardinal: Set[Direction] = Set(N, E, S, W)
 
         def allDirections: Set[Direction] = allCardinal ++ Set(NE, SE, SW, NW)
-        
+
         def fromArrow(arrow: Char): Direction =
             Direction.values.find(d => d.symbol == arrow).getOrElse(throw AoCException(s"invalid direction [$arrow]"))
     }
