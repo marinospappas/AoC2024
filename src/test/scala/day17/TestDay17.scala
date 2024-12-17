@@ -3,8 +3,8 @@ package day17
 
 import framework.{AocMain, InputReader}
 import solutions.day17.ByteComputer17
+import solutions.day17.ByteComputer17.toAssembly
 
-import org.mpdev.scala.aoc2024.solutions.day17.ByteComputer17.toAssembly
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
 
@@ -26,9 +26,7 @@ class TestDay17 extends AnyFlatSpec {
     )
     it should "run simple program" in {
         val solver = ByteComputer17(prog1)
-        solver.aocVm.newProgram
-        solver.aocVm.runProgram(solver.regInit)
-        solver.aocVm.waitForProgram()
+        solver.aocVm.runProgramAndWait(solver.regInit, timeout = 50)
         solver.aocVm.getProgramRegister("B") shouldBe 1
     }
 
@@ -57,7 +55,7 @@ class TestDay17 extends AnyFlatSpec {
 
     it should "solve part1 correctly" in {
         val solver = ByteComputer17()
-        solver.part1 shouldBe 12
+        solver.part1 shouldBe "4,6,3,5,6,3,5,2,1,0"
     }
 
     private val prog4 = Vector(
@@ -76,10 +74,12 @@ class TestDay17 extends AnyFlatSpec {
         val solver = ByteComputer17(InputReader.read(17, "./src/main/resources/input/input"))
         val asm = toAssembly(solver.progList)
         asm.foreach(println)
-        asm.size shouldBe 16
+        asm.size shouldBe 8
     }
 
     it should "verify processing based on a" in {
-        println(ByteComputer17.processOctalDigits(249))
+        val result = ByteComputer17.processOctalDigits(249)
+        println(result)
+        result shouldBe 5
     }
 }
