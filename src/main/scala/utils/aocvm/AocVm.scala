@@ -1,10 +1,12 @@
 package org.mpdev.scala.aoc2024
 package utils.aocvm
 
-open class AocVm(instructionList: List[String], instanceNamePrefix: String = AbstractAocVm.DEF_PROG_INSTANCE_PREFIX) extends
-    AbstractAocVm(instructionList, instanceNamePrefix) {
+open class AocVm(instructionList: Vector[String], program: Program, instanceNamePrefix: String = AbstractAocVm.DEF_PROG_INSTANCE_PREFIX) extends
+    AbstractAocVm(instructionList, program, instanceNamePrefix) {
 
-    def newProgram(instructionList: List[String]): Int = setupNewInstance(instructionList)
+    def newProgram: Int = setupNewInstance(instructionList)
+    
+    def newProgram(instructionList: Vector[String]): Int = setupNewInstance(instructionList)
 
     def aocCtl(cmd: AocCmd, value: Any, programId: Int = 0): Unit = super.aocCtl(programId, cmd, value)
 
@@ -16,9 +18,9 @@ open class AocVm(instructionList: List[String], instanceNamePrefix: String = Abs
 
     def waitForProgram(programId: Int): Unit = waitForAocProgram(programId)
     
-    def runProgramAndWait(initReg: Map[String, Long] = Map(), programId: Int = 0): Unit =
-         log.info(s"AocCode instance [$programId] starting with Wait")
-         runAocProgramAndWait(programId, initReg)
+    //def runProgramAndWait(initReg: Map[String, Long] = Map(), programId: Int = 0): Unit =
+    //     log.info(s"AocCode instance [$programId] starting with Wait")
+    //     runAocProgramAndWait(programId, initReg)
 
 
     def sendInputToProgram(data: Int): Unit = sendInputToProgram(data, 0)
@@ -32,9 +34,9 @@ open class AocVm(instructionList: List[String], instanceNamePrefix: String = Abs
      def getFinalOutputFromProgram: List[Int] = getProgramFinalOutputLong(0).map( _.toInt )
      def getAsyncOutputFromProgram(programId: Int = 0): List[Int] = getProgramAsyncOutputLong(programId).map( _.toInt )
 
-    def getFinalOutputFromProgram(programId: Int): List[Int] = getProgramFinalOutputLong(programId).map(_.toInt)
+     def getFinalOutputFromProgram(programId: Int): List[Int] = getProgramFinalOutputLong(programId).map(_.toInt)
 
-    def getFinalOutputFromProgramLong: List[Long] = getProgramFinalOutputLong(0)
+     def getFinalOutputFromProgramLong: List[Long] = getProgramFinalOutputLong(0)
      def getAsyncOutputFromProgramLong(programId: Int = 0): List[Long] = getProgramAsyncOutputLong(programId)
 
     def programIsRunning(): Boolean = aocProgramIsRunning(0)

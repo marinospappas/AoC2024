@@ -52,6 +52,7 @@ class Djikstra[T](g: Graph[T]) {
                 log.trace(s"> connected nodes for node $curNode")
                 for connectedNode <- g.getConnected(curNode).filter( _._1 != start) do {
                     val nextPathNode = PathNode(connectedNode._1, connectedNode._2)
+                    //TODO investigate improvement by implementing visited list
                     //if (visited.contains(nextPathNode))
                     //    break()
                     iterations += 1
@@ -68,6 +69,7 @@ class Djikstra[T](g: Graph[T]) {
     }
 
     private def getPaths(start: T, isAtEnd: T => Boolean): Vector[Vector[(T, Int)]] = {
+        //TODO: the below is actually a List of points that satisfy isAtEnd
         val end = predecessors.keys.find(isAtEnd(_)).get
         val allPaths = ArrayBuffer[ArrayBuffer[(T, Int)]]()
         val queue = util.ArrayDeque[ArrayBuffer[(T, Int)]]()

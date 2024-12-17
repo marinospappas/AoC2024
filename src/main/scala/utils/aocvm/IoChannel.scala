@@ -20,5 +20,5 @@ class IoChannel[T] {
 }
 
 object IoChannel {
-    val READ_TIMEOUT = 10000
+    val READ_TIMEOUT = 1000
 }

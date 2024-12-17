@@ -1,8 +1,10 @@
 package org.mpdev.scala.aoc2024
-package utils.aocvm
+package utils.aocvm.asm
 
 import utils.aocvm.OpResultCode.*
-import utils.aocvm.ParamReadWrite.{R, W}
+import ParamReadWrite.{R, W}
+import utils.aocvm.OpResultCode
+import utils.aocvm.OpResultCode
 
 import scala.collection.mutable
 
@@ -51,12 +53,3 @@ enum ParamReadWrite {
     case W
 }
 
-enum OpResultCode {
-    case SET_MEMORY
-    case INCR_PC
-    case INPUT
-    case OUTPUT
-    case EXIT
-    case NONE
-    case CUSTOM
-}
