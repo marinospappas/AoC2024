@@ -1,9 +1,10 @@
 package org.mpdev.scala.aoc2024
 package day17
 
-import framework.AocMain
+import framework.{AocMain, InputReader}
 import solutions.day17.ByteComputer17
 
+import org.mpdev.scala.aoc2024.solutions.day17.ByteComputer17.toAssembly
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
 
@@ -58,5 +59,27 @@ class TestDay17 extends AnyFlatSpec {
         val solver = ByteComputer17()
         solver.part1 shouldBe 12
     }
-        
+
+    private val prog4 = Vector(
+        "Register A: 1",
+        "",
+        "Program: 5,1,5,2,3,4"
+    )
+    it should "run program that loops" in {
+        val solver = ByteComputer17(prog4)
+        val result = solver.part1
+        println(result)
+        result shouldBe "1,2"
+    }
+
+    it should "convert program to Assembly" in {
+        val solver = ByteComputer17(InputReader.read(17, "./src/main/resources/input/input"))
+        val asm = toAssembly(solver.progList)
+        asm.foreach(println)
+        asm.size shouldBe 16
+    }
+
+    it should "verify processing based on a" in {
+        println(ByteComputer17.processOctalDigits(249))
+    }
 }

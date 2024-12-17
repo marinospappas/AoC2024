@@ -13,6 +13,10 @@ open class AocVm(instructionList: Vector[String], program: Program, instanceName
      def runProgram(initReg: Map[String, Long] = Map(), programId: Int = 0): Unit =
         log.info(s"AocCode instance [$programId] starting")
         runAocProgram(programId, initReg)
+
+     def runProgramAndWait(initReg: Map[String, Long] = Map(), programId: Int = 0, timeout: Int = -1): Unit =
+         log.info(s"AocCode instance [$programId] starting")
+         runAocProgramAndWait(programId, initReg, timeout)
         
     def waitForProgram(): Unit = waitForProgram(0)
 

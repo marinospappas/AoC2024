@@ -19,7 +19,7 @@ abstract class Program {
 
     def newInstance(prog: Vector[String], ioChannel: List[IoChannel[Long]]): Program
         
-    def run(initReg: Map[String, Long] = Map(), maxCount: Int = Int.MaxValue): Int // Future[Int]
+    def run(initReg: Map[String, Long] = Map(), maxCount: Int = Int.MaxValue): Future[Int]
     
     def getRegister(reg: String): Long
     

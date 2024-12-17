@@ -21,7 +21,7 @@ class ByteProgram extends Program {
     private var instructionList: ArrayBuffer[Int] = ArrayBuffer()
     private var ioChannel: List[IoChannel[Long]] = List()
 
-    private val registers = mutable.Map[String, Long]().withDefaultValue(0)
+    private val registers = mutable.Map[String, Long]().withDefaultValue(0L)
 
     override def newInstance(prog: Vector[String], ioChannel: List[IoChannel[Long]]): Program = {
         instructionList = prog.map(_.toInt).to(ArrayBuffer)
@@ -29,8 +29,8 @@ class ByteProgram extends Program {
         this
     }
 
-    override def run(initReg: Map[String, Long] = Map(), maxCount: Int = Int.MaxValue): Int = { // Future[Int] = Future[Int] {
-        log.info(s"$instanceName started${if (initReg.nonEmpty) ", init registers:" else ""} ${initReg.mkString}")
+    override def run(initReg: Map[String, Long] = Map(), maxCount: Int = Int.MaxValue): Future[Int] = Future[Int] {
+        log.info(s"$instanceName started${if (initReg.nonEmpty) ", init registers:" else ""} ${initReg.mkString(", ")}")
         var pc: Int = 0
         var outputCount: Int = 0
         registers.clear()
@@ -48,7 +48,6 @@ class ByteProgram extends Program {
                     case OUTPUT =>
                         log.debug(s"AocProg $instanceName writing to output $value")
                         ioChannel(1).send(valueOf(value))
-                        println(s"Out $value")
                         outputCount += 1
                     case EXIT => break()
                     case NONE => ;
@@ -73,6 +72,7 @@ class ByteProgram extends Program {
             case l: Long => l
             case s: String => registers(s)
 
+    // TODO: change the params to List[Long] or (Long, Long)
     private def mapParams(instr: OpCode, param: Int): List[Any] =
         val newParams = ArrayBuffer[Any]()
         if instr.inpReg != REG_NA then

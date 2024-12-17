@@ -20,9 +20,8 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
     private val instanceTable: ArrayBuffer[AocInstance] = ArrayBuffer[AocInstance]()
 
     {
-        // clears the instance table and creates the first instance of the AocCode program
+        // clears the instance table
         instanceTable.clearAndShrink()
-        setupNewInstance(instructionList)
     }
 
     protected def setupNewInstance(instructionList: Vector[String]): Int =
@@ -39,26 +38,26 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
         //           case AocCmd.SET_OUTPUT_BUFFER_SIZE => instanceTable(programId).ioChannels(1) = Channel(value.asInstanceOf[Int])
 
     /// protected / internal functions
-    def runAocProgram(programId: Int, initReg: Map[String, Long] = Map()): Int = // Future[Int] =
+    def runAocProgram(programId: Int, initReg: Map[String, Long] = Map()): Future[Int] =
         instanceTable(programId).program.run(initReg)
 
-    // TODO: implement wait for program that has been started asynchronously
-
-    //def runAocProgramAndWait(programId: Int, initReg: Map[String, Long] = Map()): Unit =
-    //    Await.result(runAocProgram(programId, initReg), Duration.apply(WAIT_PRG_TIMEOUT, TimeUnit.SECONDS))
+    def runAocProgramAndWait(programId: Int, initReg: Map[String, Long] = Map(), timeout: Int): Unit =
+        Await.result(runAocProgram(programId, initReg), Duration.apply(if timeout > 0 then timeout else WAIT_PRG_TIMEOUT, TimeUnit.MILLISECONDS))
 
     protected def aocProgramIsRunning(programId: Int): Boolean =
         instanceTable(programId).program.programState != COMPLETED
 
     protected def waitForAocProgram(programId: Int): Unit =
         while (instanceTable(programId).program.programState == RUNNING) {
-            Thread.sleep(5)
+            Thread.sleep(2)
         }
+        Thread.sleep(2)
+
 
     protected def setProgramInput(data: List[Long], programId: Int): Unit =
         log.debug(s"set program input to ${data.mkString(", ")}")
         setInputValues(data, instanceTable(programId).ioChannels.head)
-        
+
     protected def getProgramFinalOutputLong(programId: Int): List[Long] =
         log.debug("getProgramFinalOutputLong called")
         Thread.sleep(1)      // required in case the program job is still waiting for input
@@ -68,7 +67,7 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
         output
 
     protected def getProgramAsyncOutputLong(programId: Int): List[Long] =
-        log.debug("getProgramAsyncOutputLong called")
+        log.debug(s"getProgramAsyncOutputLong called, is channel empty ${instanceTable(programId).ioChannels(1).isEmpty}")
         val outputValues = ArrayBuffer[Long]()
         outputValues += instanceTable(programId).ioChannels(1).receive
         while (!instanceTable(programId).ioChannels(1).isEmpty) {
@@ -116,5 +115,5 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
 
 object AbstractAocVm {
     val DEF_PROG_INSTANCE_PREFIX: String = "aocprog"
-    val WAIT_PRG_TIMEOUT = 10
+    val WAIT_PRG_TIMEOUT = 10_000
 }

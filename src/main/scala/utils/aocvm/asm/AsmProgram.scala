@@ -37,7 +37,7 @@ class AsmProgram extends Program {
         this
     }
 
-    override def run(initReg: Map[String, Long] = Map(), maxCount: Int = Int.MaxValue): Int = { // Future[Int] = Future[Int] {
+    override def run(initReg: Map[String, Long] = Map(), maxCount: Int = Int.MaxValue): Future[Int] = Future[Int] {
         log.info(s"$instanceName started${if (initReg.nonEmpty) ", init registers:" else ""} ${initReg.mkString}")
         var pc: Int = 0
         var outputCount: Int = 0

@@ -1,0 +1,8 @@
+ 0: BST A   B = A & 0111b
+ 2: BXL 5   B = B ^ 0101b
+ 4: CDV B   C = A / POW(2, B)
+ 6: BXL 6   B = B ^ 0110b
+ 8: ADV 3   A = A / 8  (shift >> 3)
+10: BXC 3   B = B ^ C
+12: OUT B   OUT B
+14: JNZ 0   IF A != 0 JUMP 0
