@@ -8,7 +8,7 @@ import utils.aocvm.bytecode.ByteProgram
 import utils.aocvm.bytecode.InstructionSet.opCodeFromByte
 
 import scala.collection.mutable.ArrayBuffer
-import scala.math.{exp, pow}
+import scala.math.pow
 
 
 class ByteComputer17(var testData: Vector[String] = Vector()) extends PuzzleSolver {
