@@ -30,17 +30,6 @@ class ByteComputer17(var testData: Vector[String] = Vector()) extends PuzzleSolv
         aocVm.getFinalOutputFromProgram.mkString(",")
     }
 
-    def findAlpha(current: Long, expOutput: String): List[Long] = {
-        if current >= 8 then
-            findAlpha(current / 8L, expOutput.substring(2, expOutput.length)).map( x => 8L * current + x )
-        else {
-            (0 to 7).map(i =>
-                aocVm.runProgramAndWait(Map("A" -> i), timeout = 50)
-                (i, aocVm.getFinalOutputFromProgram.mkString(","))
-            ).filter(_._2 == expOutput).map(_._1.toLong).toList
-        }
-    }
-
     override def part2: Any = {
         val alpha: ArrayBuffer[Long] = ArrayBuffer(0L)
         for out <- progList.reverse do {
