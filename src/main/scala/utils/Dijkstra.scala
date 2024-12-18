@@ -19,7 +19,7 @@ class Dijkstra[T](g: Graph[T]) {
 
     private val distFromStart: mutable.Map[T, Int] = mutable.Map()
     private val predecessors: mutable.Map[T, ArrayBuffer[T]] = mutable.Map()
-    val visited: ArrayBuffer[PathNode[T]] = ArrayBuffer()
+    val visited: mutable.Set[PathNode[T]] = mutable.Set()
     var iterations = 0
 
     def minPath(start: T, isAtEnd: T => Boolean): Vector[(T, Int)] = {
@@ -37,7 +37,7 @@ class Dijkstra[T](g: Graph[T]) {
             allPaths.filter(p => p.head._2 == minCost)
         }
     }
-    
+
     def allPaths(start: T, isAtEnd: T => Boolean): Vector[Vector[(T, Int)]] = {
         findPath(start, allPaths = true)
         getPaths(start, t => isAtEnd(t))
@@ -65,18 +65,19 @@ class Dijkstra[T](g: Graph[T]) {
                 log.trace(s"> connected nodes for node $curNode")
                 for connectedNode <- g.getConnected(curNode).filter( _._1 != start) do {
                     val nextPathNode = PathNode(connectedNode._1, connectedNode._2)
-                    //TODO investigate improvement by implementing visited list
-                    //if (visited.contains(nextPathNode))
-                    //    break()
-                    iterations += 1
-                    visited += nextPathNode
-                    val totalDistance = curDistance + connectedNode._2
-                    if totalDistance < distFromStart.getOrElse(connectedNode._1, Int.MaxValue) then {
-                        distFromStart(connectedNode._1) = totalDistance
-                        predecessors(connectedNode._1) = ArrayBuffer(curNode)
-                        priorityQueue.add(PathNode(connectedNode._1, totalDistance))
-                    } else if allPaths then    // if all paths are needed then add a predecessor to the existing list (can be very slow!!)
-                        predecessors(connectedNode._1) = predecessors.getOrElse(connectedNode._1, ArrayBuffer()) :+ curNode
+                    // visited is used only when the first min path is needed
+                    if allPaths || !visited.contains(nextPathNode) then {
+                        iterations += 1
+                        visited += nextPathNode
+                        val totalDistance = curDistance + connectedNode._2
+                        if totalDistance < distFromStart.getOrElse(connectedNode._1, Int.MaxValue) then {
+                            distFromStart(connectedNode._1) = totalDistance
+                            predecessors(connectedNode._1) = ArrayBuffer(curNode)
+                            priorityQueue.add(PathNode(connectedNode._1, totalDistance))
+                        } else if allPaths then
+                            // if all paths are needed then add a predecessor to the existing list (can be very slow in big graphs!!)
+                            predecessors(connectedNode._1) = predecessors.getOrElse(connectedNode._1, ArrayBuffer()) :+ curNode
+                    }
                 }
         }
     }

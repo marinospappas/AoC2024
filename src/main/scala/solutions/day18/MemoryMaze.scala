@@ -18,8 +18,10 @@ class MemoryMaze extends PuzzleSolver {
     val end: Point = Point(GRID_DIMENSIONS._1 - 1, GRID_DIMENSIONS._2 - 1)
 
     override def part1: Any = {
-        val minPath = Dijkstra[Point](graph).minPath(start, p => p == end)
+        val dijkstra = Dijkstra[Point](graph)
+        val minPath = dijkstra.minPath(start, p => p == end)
         minPath.foreach(p => grid.setDataPoint(p._1, PATH))
+        println(s"part 1 - Dijkstra iterations: ${dijkstra.iterations}")
         minPath.head._2
     }
 
@@ -27,6 +29,8 @@ class MemoryMaze extends PuzzleSolver {
         var memIndex = NUM_OF_CORRUPTED
         var startIndx = NUM_OF_CORRUPTED + 1
         var endIndx = inputData.length - 1
+        var invocations = 0
+        var iterations = 0
         while startIndx < endIndx do {    // binary search
             val midIndex = (startIndx + endIndx) / 2
             val newGrid = GridBuilder[MemoryState]().withGridData(grid.getDataPoints).withMapper(MemoryState.mapper)
@@ -34,11 +38,15 @@ class MemoryMaze extends PuzzleSolver {
             for p <- (NUM_OF_CORRUPTED + 1 to midIndex).map(i => Point.from(inputData(i))) do
                 newGrid.setDataPoint(p, CORRUPTED)
             val newGraph = GraphBuilder[Point]().withCustomGetConnected(p => getNeighbours(p, newGrid)).build()
-            if Dijkstra[Point](newGraph).minPath(start, p => p == end).nonEmpty then
+            val dijkstra = Dijkstra[Point](newGraph)
+            if dijkstra.minPath(start, p => p == end).nonEmpty then
                 startIndx = midIndex + 1
             else
                 endIndx = midIndex
+            invocations += 1
+            iterations += dijkstra.iterations
         }
+        println(s"part 2 - Dijkstra invocations: $invocations, total iterations: $iterations")
         inputData(endIndx)
     }
 }
