@@ -20,7 +20,7 @@ class MemoryMaze extends PuzzleSolver {
     override def part1: Any = {
         val minPath = Dijkstra[Point](graph).minPath(start, p => p == end)
         minPath.foreach(p => grid.setDataPoint(p._1, PATH))
-        minPath.size - 1
+        minPath.head._2
     }
 
     override def part2: Any = {
