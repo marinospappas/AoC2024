@@ -10,6 +10,8 @@ import scala.math.abs
 case class Point(x: Int, y: Int) extends Comparable[Point] {
 
     def this(p: Point) = this(p.x, p.y)
+    
+    def this(s: String) = this(s.split(",")(0).toInt, s.split(",")(1).toInt)
 
     override def compareTo(other: Point): Int =
         // order is from top to bottom and from left to right
@@ -62,4 +64,12 @@ case class Point(x: Int, y: Int) extends Comparable[Point] {
                 return 1
             Integer.compare(p1.y, p2.y)
     }
+}
+
+object Point {
+    def from(s: String): Point = {
+        val a = s.split(",")
+        Point(a(0).toInt, a(1).toInt)
+    }
+
 }

@@ -7,7 +7,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class Bfs[T](g: Graph[T]) {
     
-    def shortestPathBfs(from: T, isAtEnd: T => Boolean): List[T] = {
+    def shortestPath(from: T, isAtEnd: T => Boolean): List[T] = {
         var curPath = ArrayBuffer[T](from)
         val visited = mutable.Set[T](from)
         val queue = util.ArrayDeque[ArrayBuffer[T]]()

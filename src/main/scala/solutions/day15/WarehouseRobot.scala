@@ -7,10 +7,6 @@ import utils.{+, SimpleGrid, x, y, *}
 import utils.SimpleGrid.Direction
 import utils.SimpleGrid.Direction.*
 
-import scala.math.min
-import scala.util.boundary
-import scala.util.boundary.break
-
 class WarehouseRobot extends PuzzleSolver {
 
     val inputData: Vector[String] = InputReader.read(15)

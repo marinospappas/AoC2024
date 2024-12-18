@@ -1,13 +1,12 @@
 package org.mpdev.scala.aoc2024
 package solutions.day16
 
-import framework.{AocMain, InputReader, PuzzleSolver}
+import framework.{InputReader, PuzzleSolver}
 import solutions.day16.ReindeerMinRoute.*
 import utils.SimpleGrid.Direction.*
 import utils.SimpleGrid.Direction
-import utils.{+, Bfs, Djikstra, DjikstraV0, Graph, GraphBuilder, MinCostPath, SimpleGrid, adjacentCardinal, manhattan, *}
+import utils.*
 
-import scala.collection.mutable
 import scala.math.abs
 import scala.util.boundary
 import scala.util.boundary.break
@@ -22,7 +21,7 @@ class ReindeerMinRoute(var testData: Vector[String] = Vector()) extends PuzzleSo
     var allPaths: Vector[Vector[(State, Int)]] = Vector()
 
     override def part1: Any = {
-        allPaths = Djikstra[State](graph).allPaths(startState, endState => endState._1 == endPosition)
+        allPaths = Dijkstra[State](graph).allMinPaths(startState, endState => endState._1 == endPosition)
         allPaths(0)(0)._2
     }
 

@@ -20,7 +20,6 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
     private val instanceTable: ArrayBuffer[AocInstance] = ArrayBuffer[AocInstance]()
 
     {
-        // clears the instance table
         instanceTable.clearAndShrink()
     }
 
@@ -106,7 +105,7 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
     protected def getProgramRegister(programId: Int, reg: String): Int =
         getProgramRegisterLong(programId, reg).toInt
 
-    case class AocInstance(program: Program, ioChannels: List[IoChannel[Long]])
+    private case class AocInstance(program: Program, ioChannels: List[IoChannel[Long]]) 
 
     enum AocCmd {
         case SET_OUTPUT_BUFFER_SIZE

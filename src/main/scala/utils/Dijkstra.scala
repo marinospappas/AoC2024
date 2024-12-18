@@ -1,20 +1,17 @@
 package org.mpdev.scala.aoc2024
 package utils
 
-import framework.AoCException
-
 import java.util.PriorityQueue
 import java.util.ArrayDeque
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.boundary
-import boundary.break
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.util
 
-class Djikstra[T](g: Graph[T]) {
+class Dijkstra[T](g: Graph[T]) {
 
     val log: Logger = LoggerFactory.getLogger("Djikstra")
 
@@ -25,15 +22,31 @@ class Djikstra[T](g: Graph[T]) {
     val visited: ArrayBuffer[PathNode[T]] = ArrayBuffer()
     var iterations = 0
 
+    def minPath(start: T, isAtEnd: T => Boolean): Vector[(T, Int)] = {
+        findPath(start)
+        if getPaths(start, t => isAtEnd(t)).isEmpty then Vector()
+        else getPaths(start, t => isAtEnd(t)).head
+    }
+
+    def allMinPaths(start: T, isAtEnd: T => Boolean): Vector[Vector[(T, Int)]] = {
+        findPath(start, allPaths = true)
+        val allPaths = getPaths(start, t => isAtEnd(t))
+        if allPaths.isEmpty then Vector()
+        else {
+            val minCost = allPaths.map( _.head._2 ).min
+            allPaths.filter(p => p.head._2 == minCost)
+        }
+    }
+    
     def allPaths(start: T, isAtEnd: T => Boolean): Vector[Vector[(T, Int)]] = {
-        allPaths(start)
+        findPath(start, allPaths = true)
         getPaths(start, t => isAtEnd(t))
     }
 
     /**
      * Dijkstra algorithm for All Paths
      */
-    private def allPaths(start: T): Unit = {
+    private def findPath(start: T, allPaths: Boolean = false): Unit = {
 
         val priorityQueue = PriorityQueue[PathNode[T]]()
         distFromStart.clear()
@@ -43,7 +56,7 @@ class Djikstra[T](g: Graph[T]) {
         predecessors.put(start, ArrayBuffer())
         iterations = 0
 
-        priorityQueue.add(PathNode(start, 0))
+        priorityQueue.add(PathNode(start))
         // while the priority Q has elements, get the top one (least cost as per Comparator)
         while (!priorityQueue.isEmpty) {
             val pathNode = priorityQueue.poll()
@@ -62,19 +75,20 @@ class Djikstra[T](g: Graph[T]) {
                         distFromStart(connectedNode._1) = totalDistance
                         predecessors(connectedNode._1) = ArrayBuffer(curNode)
                         priorityQueue.add(PathNode(connectedNode._1, totalDistance))
-                    } else
+                    } else if allPaths then    // if all paths are needed then add a predecessor to the existing list (can be very slow!!)
                         predecessors(connectedNode._1) = predecessors.getOrElse(connectedNode._1, ArrayBuffer()) :+ curNode
                 }
         }
     }
 
-    private def getPaths(start: T, isAtEnd: T => Boolean): Vector[Vector[(T, Int)]] = {
-        //TODO: the below is actually a List of points that satisfy isAtEnd
-        val end = predecessors.keys.find(isAtEnd(_)).get
+    private def getPaths(start: T, isAtEnd: T => Boolean, minPath: Boolean = false): Vector[Vector[(T, Int)]] = {
+        val endStatuses = predecessors.keys.filter(isAtEnd(_))
+        if endStatuses.isEmpty then return Vector()
         val allPaths = ArrayBuffer[ArrayBuffer[(T, Int)]]()
         val queue = util.ArrayDeque[ArrayBuffer[(T, Int)]]()
-        var curPath = ArrayBuffer[(T, Int)]((end, distFromStart(end)))
-        queue.add(curPath)
+        var curPath = ArrayBuffer[(T, Int)]()
+        for end <- endStatuses do
+            queue.add(ArrayBuffer[(T, Int)]((end, distFromStart(end))))
         while !queue.isEmpty do {
             curPath = queue.poll()
             val lastNode = curPath.last

@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
 
-class TestDjikstra extends AnyFlatSpec {
+class TestDijkstra extends AnyFlatSpec {
 
-    val log: Logger = LoggerFactory.getLogger(classOf[TestDjikstra])
+    val log: Logger = LoggerFactory.getLogger(classOf[TestDijkstra])
     
     val graph: Graph[String] = Graph()
     {

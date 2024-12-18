@@ -18,11 +18,11 @@ import solutions.day14.RobotSimulator
 import solutions.day15.WarehouseRobot
 import solutions.day16.ReindeerMinRoute
 import solutions.day17.ByteComputer17
-import solutions.day18.Day18Solver
+import solutions.day18.MemoryMaze
 
 val solvers = Map(
     1 -> LocationAnalyser(), 2 -> ReportAnalyser(), 3 -> CorruptedMemoryCleaner(), 4 -> WordSearch(), 5 -> PrintingRules(),
     6 -> MapRouteExplorer(), 7 -> BridgeRepair(), 8 -> AntennaPositionAnalyser(), 9 -> DiskFragmenter(), 10 -> TrailFinder(),
     11 -> PebbleTransformation(), 12 -> FenceCalculator(), 13 -> ClawMachinePlayer(), 14 -> RobotSimulator(), 15 -> WarehouseRobot(),
-    16 -> ReindeerMinRoute(), 17 -> ByteComputer17(), 18 -> Day18Solver()
+    16 -> ReindeerMinRoute(), 17 -> ByteComputer17(), 18 -> MemoryMaze()
 )

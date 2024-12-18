@@ -24,7 +24,7 @@ class TestDay16 extends AnyFlatSpec {
 
     it should "solve part1 correctly" in {
         val result = solver.part1
-        println(solver.allPaths(0))
+        solver.allPaths.foreach(println)
         result shouldBe 11048
     }
 
