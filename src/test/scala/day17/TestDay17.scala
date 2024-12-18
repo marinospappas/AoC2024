@@ -26,7 +26,9 @@ class TestDay17 extends AnyFlatSpec {
     )
     it should "run simple program" in {
         val solver = ByteComputer17(prog1)
-        solver.aocVm.runProgramAndWait(solver.regInit, timeout = 50)
+        solver.aocVm.newProgram
+        solver.aocVm.runProgram(solver.regInit)
+        solver.aocVm.waitForProgram(timeout = 100)
         solver.aocVm.getProgramRegister("B") shouldBe 1
     }
 

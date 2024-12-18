@@ -22,11 +22,8 @@ class ByteComputer17(var testData: Vector[String] = Vector()) extends PuzzleSolv
     override def part1: Any = {
         aocVm.newProgram
         aocVm.runProgram(regInit)
-        if aocVm.waitForProgram(timeout = 100000000) < 0 then {
-            log.error("program was interrupted")
-            ""
-        }
-        else aocVm.getFinalOutputFromProgram.mkString(",")
+        if aocVm.waitForProgram(timeout = 100) < 0 then log.error("program was interrupted")
+        aocVm.getFinalOutputFromProgram.mkString(",")
     }
 
     override def part2: Any = {
