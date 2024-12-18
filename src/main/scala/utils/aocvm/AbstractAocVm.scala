@@ -1,7 +1,7 @@
 package org.mpdev.scala.aoc2024
 package utils.aocvm
 
-import utils.aocvm.ProgramState.{COMPLETED, RUNNING}
+import utils.aocvm.ProgramState.COMPLETED
 import utils.aocvm.AbstractAocVm.WAIT_PRG_TIMEOUT
 
 import org.slf4j.Logger
@@ -38,7 +38,8 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
 
     /// protected / internal functions
     def runAocProgram(programId: Int, initReg: Map[String, Long] = Map()): Future[Int] =
-        instanceTable(programId).program.run(initReg)
+        instanceTable(programId).job = instanceTable(programId).program.run(initReg)
+        instanceTable(programId).job
 
     def runAocProgramAndWait(programId: Int, initReg: Map[String, Long] = Map(), timeout: Int): Unit =
         Await.result(runAocProgram(programId, initReg), Duration.apply(if timeout > 0 then timeout else WAIT_PRG_TIMEOUT, TimeUnit.MILLISECONDS))
@@ -46,12 +47,15 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
     protected def aocProgramIsRunning(programId: Int): Boolean =
         instanceTable(programId).program.programState != COMPLETED
 
-    protected def waitForAocProgram(programId: Int): Unit =
-        while (instanceTable(programId).program.programState == RUNNING) {
-            Thread.sleep(2)
+    protected def waitForAocProgram(programId: Int, timeout: Int): Int = {
+        try {
+            Await.result(instanceTable(programId).job,
+                Duration.apply(if timeout > 0 then timeout else WAIT_PRG_TIMEOUT, TimeUnit.MILLISECONDS))
+        } catch {
+            case e: Exception => log.error(s"exception occurred: ${e.getMessage}")
+                -1
         }
-        Thread.sleep(2)
-
+    }
 
     protected def setProgramInput(data: List[Long], programId: Int): Unit =
         log.debug(s"set program input to ${data.mkString(", ")}")
@@ -60,7 +64,7 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
     protected def getProgramFinalOutputLong(programId: Int): List[Long] =
         log.debug("getProgramFinalOutputLong called")
         Thread.sleep(1)      // required in case the program job is still waiting for input
-        waitForAocProgram(programId)
+        //waitForAocProgram(programId, 0)
         val output = getOutputValues(instanceTable(programId).ioChannels(1))
         log.debug(s"returning output: ${output.mkString(", ")}")
         output
@@ -105,7 +109,7 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
     protected def getProgramRegister(programId: Int, reg: String): Int =
         getProgramRegisterLong(programId, reg).toInt
 
-    private case class AocInstance(program: Program, ioChannels: List[IoChannel[Long]]) 
+    private case class AocInstance(program: Program, ioChannels: List[IoChannel[Long]], var job: Future[Int] | Null = null)
 
     enum AocCmd {
         case SET_OUTPUT_BUFFER_SIZE
@@ -114,5 +118,5 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
 
 object AbstractAocVm {
     val DEF_PROG_INSTANCE_PREFIX: String = "aocprog"
-    val WAIT_PRG_TIMEOUT = 10_000
+    val WAIT_PRG_TIMEOUT = 1000
 }

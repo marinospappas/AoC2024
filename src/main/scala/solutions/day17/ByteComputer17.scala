@@ -2,11 +2,12 @@ package org.mpdev.scala.aoc2024
 package solutions.day17
 
 import framework.{InputReader, PuzzleSolver}
-import solutions.day17.ByteComputer17.{processOctalDigits, readRegister, toProgram}
+import solutions.day17.ByteComputer17.{log, processOctalDigits, readRegister, toProgram}
 import utils.aocvm.AocVm
 import utils.aocvm.bytecode.ByteProgram
 import utils.aocvm.bytecode.InstructionSet.opCodeFromByte
 
+import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.mutable.ArrayBuffer
 import scala.math.pow
 
@@ -16,18 +17,16 @@ class ByteComputer17(var testData: Vector[String] = Vector()) extends PuzzleSolv
     val inputData: Vector[String] = if (testData.nonEmpty) testData else InputReader.read(17)
     val regInit: Map[String, Long] = inputData.slice(0, inputData.indexOf("")).map(readRegister).toMap
     val progList: Vector[String] = toProgram(inputData.last)
-
     val aocVm = AocVm(progList, ByteProgram())
-    {
-        aocVm.newProgram    // create instance of our program in the VM
-    }
 
     override def part1: Any = {
-        try {
-            aocVm.runProgramAndWait(regInit, timeout = 50)
-        } catch
-            case e: Exception => println(s"exception occurred: ${e.getMessage}")
-        aocVm.getFinalOutputFromProgram.mkString(",")
+        aocVm.newProgram
+        aocVm.runProgram(regInit)
+        if aocVm.waitForProgram(timeout = 100000000) < 0 then {
+            log.error("program was interrupted")
+            ""
+        }
+        else aocVm.getFinalOutputFromProgram.mkString(",")
     }
 
     override def part2: Any = {
@@ -42,10 +41,11 @@ class ByteComputer17(var testData: Vector[String] = Vector()) extends PuzzleSolv
         }
         alpha.min
     }
-
 }
 
 object ByteComputer17 {
+
+    val log: Logger = LoggerFactory.getLogger(classOf[ByteComputer17])
 
     /*
     Conversion to Assembly

@@ -13,7 +13,7 @@ class Bfs[T](g: Graph[T]) {
         val queue = util.ArrayDeque[ArrayBuffer[T]]()
         queue.add(curPath)
         while (!queue.isEmpty) {
-            curPath = queue.removeFirst()
+            curPath = queue.poll()
             val lastNode = curPath(curPath.size - 1)
             if isAtEnd(lastNode) then   // found path
                 return curPath.toList

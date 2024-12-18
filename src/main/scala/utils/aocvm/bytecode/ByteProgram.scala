@@ -39,7 +39,7 @@ class ByteProgram extends Program {
             while (pc < instructionList.size && outputCount < maxCount) {
                 val (instr, param) = (opCodeFromByte(instructionList(pc)), instructionList(pc + 1))
                 val mappedParams = mapParams(instr, param)
-                log.debug(s"$instanceName pc: $pc instruction: ${instr.code} ${mappedParams.mkString(", ")}")
+                log.debug(s"$instanceName pc: $pc instruction: ${instr.code} [${mappedParams.mkString(", ")}]")
                 val (resCode, reg, value) = instr.execute(mappedParams)
                 log.debug(s"$instanceName     result: $resCode $reg $value")
                 resCode match {
@@ -72,9 +72,8 @@ class ByteProgram extends Program {
             case l: Long => l
             case s: String => registers(s)
 
-    // TODO: change the params to List[Long] or (Long, Long)
-    private def mapParams(instr: OpCode, param: Int): List[Any] =
-        val newParams = ArrayBuffer[Any]()
+    private def mapParams(instr: OpCode, param: Int): List[Long] =
+        val newParams = ArrayBuffer[Long]()
         if instr.inpReg != REG_NA then
             instr.inpReg.split(",").foreach(r => newParams += valueOf(r))
         newParams += (
@@ -84,7 +83,7 @@ class ByteProgram extends Program {
                     if param <= 3 then  valueOf(param)
                     else if param <= 6 then valueOf(('A' + param - 4).toChar.toString)
                     else throw AoCException(s"invalid value of Combo parameter: $param")
-                case NA => ;
+                case NA => valueOf(param)
             )
         newParams.toList
 

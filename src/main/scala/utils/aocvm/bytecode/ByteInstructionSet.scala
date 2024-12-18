@@ -61,24 +61,20 @@ object InstructionSet {
     (The numerator is still read from the A register.)
      */
     val opCodesList: mutable.Map[Int, OpCode] = mutable.Map(
-        ADV -> OpCode("ADV", "A", C, { a => (SET_MEMORY, "A",
-            a.head.asInstanceOf[Long] / pow(2.0, a(1).asInstanceOf[Long].toDouble).asInstanceOf[Long]) }),
-        BDV -> OpCode("BDV", "A", C, { a => (SET_MEMORY, "B",
-            a.head.asInstanceOf[Long] / pow(2.0, a(1).asInstanceOf[Long].toDouble).asInstanceOf[Long]) }),
-        CDV -> OpCode("CDV", "A", C, { a => (SET_MEMORY, "C",
-            a.head.asInstanceOf[Long] / pow(2.0, a(1).asInstanceOf[Long].toDouble).asInstanceOf[Long]) }),
-        JNZ -> OpCode("JNZ", "A", L, { a =>
-            if (a.head.asInstanceOf[Long] != 0L) (SET_PC, "_", a(1).asInstanceOf[Long]) else (NONE, "_", 0) }),
-        OUT -> OpCode("OUT", "_", C, { a => (OUTPUT, "_", a.head.asInstanceOf[Long] % 8) }),
-        BXL -> OpCode("BXL", "B", L, { a => (SET_MEMORY, "B", a.head.asInstanceOf[Long] ^ a(1).asInstanceOf[Long]) }),
-        BST -> OpCode("BST", "_", C, { a => (SET_MEMORY, "B", a.head.asInstanceOf[Long] % 8) }),
-        BXC -> OpCode("BXC", "B,C", NA, { a => (SET_MEMORY, "B", a.head.asInstanceOf[Long] ^ a(1).asInstanceOf[Long]) }),
+        ADV -> OpCode("ADV", "A", C, { a => (SET_MEMORY, "A", a.head / pow(2.0, a(1).toDouble).asInstanceOf[Long]) }),
+        BDV -> OpCode("BDV", "A", C, { a => (SET_MEMORY, "B", a.head / pow(2.0, a(1).toDouble).asInstanceOf[Long]) }),
+        CDV -> OpCode("CDV", "A", C, { a => (SET_MEMORY, "C", a.head / pow(2.0, a(1).toDouble).asInstanceOf[Long]) }),
+        JNZ -> OpCode("JNZ", "A", L, { a => if (a.head != 0L) (SET_PC, "_", a(1)) else (NONE, "_", 0) }),
+        OUT -> OpCode("OUT", "_", C, { a => (OUTPUT, "_", a.head % 8) }),
+        BXL -> OpCode("BXL", "B", L, { a => (SET_MEMORY, "B", a.head ^ a(1)) }),
+        BST -> OpCode("BST", "_", C, { a => (SET_MEMORY, "B", a.head % 8) }),
+        BXC -> OpCode("BXC", "B,C", NA, { a => (SET_MEMORY, "B", a.head ^ a(1)) }),
     )
 
     def opCodeFromByte(b: Int): OpCode = opCodesList(b)
 }      
 
-case class OpCode(code: String, inpReg: String, paramMode: ParamMode, execute: List[Any] => (OpResultCode, String, Long))
+case class OpCode(code: String, inpReg: String, paramMode: ParamMode, execute: List[Long] => (OpResultCode, String, Long))
 
 enum ParamMode {
     case L   // Literal

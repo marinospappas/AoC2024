@@ -18,9 +18,7 @@ open class AocVm(instructionList: Vector[String], program: Program, instanceName
          log.info(s"AocCode instance [$programId] starting")
          runAocProgramAndWait(programId, initReg, timeout)
         
-    def waitForProgram(): Unit = waitForProgram(0)
-
-    def waitForProgram(programId: Int): Unit = waitForAocProgram(programId)
+    def waitForProgram(timeout: Int = 0): Int = waitForAocProgram(0, timeout)
     
     //def runProgramAndWait(initReg: Map[String, Long] = Map(), programId: Int = 0): Unit =
     //     log.info(s"AocCode instance [$programId] starting with Wait")
