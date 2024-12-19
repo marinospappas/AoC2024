@@ -4,10 +4,8 @@ package day01
 import solutions.day01.LocationAnalyser
 
 import framework.AocMain
-import org.scalatest.prop.TableDrivenPropertyChecks.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
-import org.scalatest.prop.Tables.Table
 
 class TestDay01 extends AnyFlatSpec {
 
