@@ -1,9 +1,9 @@
 package org.mpdev.scala.aoc2024
-package solutions.day0
+package solutions.day20
 
 import framework.{InputReader, PuzzleSolver}
 
-class Day0Solver extends PuzzleSolver {
+class Day20Solver extends PuzzleSolver {
 
     val inputData: Vector[String] = InputReader.read(0)
 
@@ -14,7 +14,7 @@ class Day0Solver extends PuzzleSolver {
         0
 }
 
-object Day0Solver {
+object Day20Solver {
 
     // input parsing
     private def readButton(s: String): (Int, Int) =

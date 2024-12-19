@@ -12,15 +12,15 @@ class AllAocTest extends AnyFlatSpec {
 
     private val params = Table(
         ("solver", "day", "expected"),
-        (solvers(1), 1, results(1)),
-        (solvers(2), 2, results(2)),
-        (solvers(3), 3, results(3)),
-        (solvers(4), 4, results(4)),
-        (solvers(5), 5, results(5)),
-        (solvers(6), 6, results(6)),
-        (solvers(7), 7, results(7)),
-        (solvers(8), 8, results(8)),
-        (solvers(9), 9, results(9)),
+        (solvers(1),  1,  results(1)),
+        (solvers(2),  2,  results(2)),
+        (solvers(3),  3,  results(3)),
+        (solvers(4),  4,  results(4)),
+        (solvers(5),  5,  results(5)),
+        (solvers(6),  6,  results(6)),
+        (solvers(7),  7,  results(7)),
+        (solvers(8),  8,  results(8)),
+        (solvers(9),  9,  results(9)),
         (solvers(10), 10, results(10)),
         (solvers(11), 11, results(11)),
         (solvers(12), 12, results(12)),
@@ -31,7 +31,12 @@ class AllAocTest extends AnyFlatSpec {
         (solvers(17), 17, results(17)),
         (solvers(18), 18, results(18)),
         (solvers(19), 19, results(19)),
-        (solvers(20), 20, results(20))
+        (solvers(20), 20, results(20)),
+        (solvers(21), 21, results(21)),
+        (solvers(22), 22, results(22)),
+        (solvers(23), 23, results(23)),
+        (solvers(24), 24, results(24)),
+        (solvers(25), 25, results(25)),
     )
 
     it should "solve all AoC puzzles" in {
