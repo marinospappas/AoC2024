@@ -56,13 +56,18 @@ open class Graph[T](
     def getAllConnectedPairs: Set[Set[T]] =
         nodes.flatMap(n => n._2.map(c => Set(n._1, c._1))).toSet
 
-    def printIt(): Unit =
+    override def toString: String = {
+        val sb = StringBuilder()
         var count = 0
-        println("[Graph]")
-        nodes.foreach( e =>
-                count += 1
-                println(s"node $count: ${e._1} connected to: ${e._2}")
+        sb.append("[Graph]\n")
+        nodes.foreach(e =>
+            count += 1
+            sb.append(s"node $count: ${e._1} connected to: ${e._2}\n")
         )
+        sb.toString()
+    }
+    
+    def printIt(): Unit = println(this.toString)
 
     def longestPathDfs(start: T, includeAllNodes: Boolean = true, isAtEnd: T => Boolean): Int =
         dfsMaxPath(start, isAtEnd, mutable.Map(), includeAllNodes)

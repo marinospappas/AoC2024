@@ -5,7 +5,6 @@ import framework.{AocMain, InputReader, PuzzleSolver}
 import utils.*
 import solutions.day14.RobotSimulator.{MAX_X, MAX_Y, getQuarter, toRobot}
 
-import scala.collection.mutable.ArrayBuffer
 import scala.util.boundary
 import scala.util.boundary.break
 

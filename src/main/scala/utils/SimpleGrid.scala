@@ -8,6 +8,7 @@ import framework.AoCException
 import java.util
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.math.{min, max}
 
 open class SimpleGrid(gridData: Vector[String]) {
 
@@ -73,6 +74,12 @@ open class SimpleGrid(gridData: Vector[String]) {
         else (0, p.y + 1)
 
     def isInsideGrid(p: (Int, Int)): Boolean = 0 <= p.x && p.x <= maxX && 0 <= p.y && p.y <= maxY
+
+    def subgrid(p1: (Int, Int), p2: (Int, Int)): SimpleGrid = {
+        val (x1, y1) = (min(p1.x, p2.x), min(p1.y, p2.y))
+        val (x2, y2) = (max(p1.x, p2.x) + 1, max(p1.y, p2.y) + 1)
+        SimpleGrid(data.map( col => col.slice(y1, y2).slice(x1, x2).mkString ).toVector)
+    }
 
     // TODO: need also indexToPos
     def posToIndex(pos: (Int, Int)): Int = pos.y * maxY + pos.x

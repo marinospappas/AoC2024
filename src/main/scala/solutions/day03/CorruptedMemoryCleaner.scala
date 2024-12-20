@@ -3,10 +3,6 @@ package solutions.day03
 
 import framework.{InputReader, PuzzleSolver}
 
-import scala.collection.mutable.ArrayBuffer
-import scala.math.{abs, multiplyExact}
-import scala.util.boundary
-import scala.util.boundary.break
 import scala.util.matching.Regex
 
 class CorruptedMemoryCleaner extends PuzzleSolver {

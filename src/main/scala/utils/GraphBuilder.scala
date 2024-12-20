@@ -19,7 +19,7 @@ case class GraphBuilder[T](
 
     def fromGraph(graph: Graph[T]): GraphBuilder[T] = 
         copy(nodes = graph.nodes.toMap, customGetConnected = graph.customGetConnected, heuristic = graph.heuristic)
-        
+    
     def withCustomGetConnected(customGetConnected: T => Set[(T, Int)]): GraphBuilder[T] = copy(customGetConnected = customGetConnected)
 
     def withHeuristic(heuristic: T => Int): GraphBuilder[T] = copy(heuristic = heuristic)

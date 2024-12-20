@@ -45,12 +45,11 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
         Await.result(runAocProgram(programId, initReg), Duration.apply(if timeout > 0 then timeout else WAIT_PRG_TIMEOUT, TimeUnit.MILLISECONDS))
 
     protected def aocProgramIsRunning(programId: Int): Boolean =
-        instanceTable(programId).program.programState != COMPLETED
+        !instanceTable(programId).job.isCompleted
 
     protected def waitForAocProgram(programId: Int, timeout: Int): Int = {
         try {
-            Await.result(instanceTable(programId).job,
-                Duration.apply(if timeout > 0 then timeout else WAIT_PRG_TIMEOUT, TimeUnit.MILLISECONDS))
+            Await.result(instanceTable(programId).job, Duration.apply(if timeout > 0 then timeout else WAIT_PRG_TIMEOUT, TimeUnit.MILLISECONDS))
         } catch {
             case e: Exception => log.error(s"exception occurred: ${e.getMessage}")
                 -1
@@ -73,9 +72,8 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
         log.debug(s"getProgramAsyncOutputLong called, is channel empty ${instanceTable(programId).ioChannels(1).isEmpty}")
         val outputValues = ArrayBuffer[Long]()
         outputValues += instanceTable(programId).ioChannels(1).receive
-        while (!instanceTable(programId).ioChannels(1).isEmpty) {
+        while !instanceTable(programId).ioChannels(1).isEmpty do
             outputValues += instanceTable(programId).ioChannels(1).receive
-        }
         log.debug(s"returning output: ${outputValues.mkString(", ")}")
         outputValues.toList
 
@@ -85,9 +83,8 @@ abstract class AbstractAocVm(instructionList: Vector[String], program: Program, 
     private def getOutputValues(outputChannel: IoChannel[Long]): List[Long] =
         val outputValues = ArrayBuffer[Long]()
         outputValues += outputChannel.receive
-        while (!outputChannel.isEmpty) {
+        while !outputChannel.isEmpty do
             outputValues += outputChannel.receive
-        }
         log.debug(s"returning output: ${outputValues.mkString(", ")}")
         outputValues.toList
 

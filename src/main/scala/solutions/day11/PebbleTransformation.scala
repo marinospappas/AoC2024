@@ -6,7 +6,6 @@ import solutions.day11.PebbleTransformation.Stone.{EVEN_DIGITS, ODD_DIGITS, ZERO
 import solutions.day11.PebbleTransformation.Stone
 
 import scala.collection.{immutable, mutable}
-import scala.collection.mutable.ArrayBuffer
 
 class PebbleTransformation extends PuzzleSolver {
 
