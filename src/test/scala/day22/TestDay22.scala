@@ -1,16 +1,15 @@
 package org.mpdev.scala.aoc2024
-package day0
+package day22
 
 import framework.AocMain
-import solutions.day0.Day21Solver
-
+import solutions.day22.Day22Solver
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
 
-class TestDay0 extends AnyFlatSpec {
+class TestDay22 extends AnyFlatSpec {
 
     AocMain.environment = "test"
-    private val solver = Day21Solver()
+    private val solver = Day22Solver()
 
     it should "read input and setup reports list" in {
         solver.inputData.foreach(println(_))

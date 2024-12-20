@@ -1,13 +1,13 @@
 package org.mpdev.scala.aoc2024
-package day0
+package day21
 
 import framework.AocMain
-import solutions.day0.Day21Solver
+import solutions.day21.Day21Solver
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
 
-class TestDay0 extends AnyFlatSpec {
+class TestDay21 extends AnyFlatSpec {
 
     AocMain.environment = "test"
     private val solver = Day21Solver()
