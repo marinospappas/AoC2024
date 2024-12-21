@@ -16,12 +16,10 @@ class Day21Solver extends PuzzleSolver {
 
 object Day21Solver {
 
-    // input parsing
-    private def readButton(s: String): (Int, Int) =
-        val matched = """Button [AB]: X\+(\d+), Y\+(\d+)""".r.findFirstMatchIn(s).get
-        (matched.group(1).toInt, matched.group(2).toInt)
-
-    private def readPrize(s: String): (Int, Int) =
-        s match { case s"Prize: X=${p1}, Y=${p2}" => (p1.toInt, p2.toInt) }
-
+    val numKeyPad = List(
+        "+---+---+---+\n| 7 | 8 | 9 |\n+---+---+---+\n| 4 | 5 | 6 |\n+---+---+---+\n| 1 | 2 | 3 |\n+---+---+---+\n    | 0 | A |\n    +---+---+"
+    )
+    val dirKeypad = List(
+        "    +---+---+\n    | ^ | A |\n+---+---+---+\n| < | v | > |\n+---+---+---+"
+    )
 }

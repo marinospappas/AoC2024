@@ -21,7 +21,6 @@ import solutions.day17.ByteComputer17
 import solutions.day18.MemoryMaze
 import solutions.day19.StripePatterns
 import solutions.day20.RaceCondition
-import solutions.day0.Day0Solver
 import solutions.day21.Day21Solver
 import solutions.day22.Day22Solver
 import solutions.day0.Day0Solver
