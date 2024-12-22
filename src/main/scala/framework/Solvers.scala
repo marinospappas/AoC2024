@@ -21,8 +21,8 @@ import solutions.day17.ByteComputer17
 import solutions.day18.MemoryMaze
 import solutions.day19.StripePatterns
 import solutions.day20.RaceCondition
-import solutions.day21.Day21Solver
-import solutions.day22.Day22Solver
+import solutions.day21.RoboticArmController
+import solutions.day22.RandomNumberSimulator
 import solutions.day0.Day0Solver
 
 val solvers = Map(
@@ -30,7 +30,7 @@ val solvers = Map(
     6 -> MapRouteExplorer(), 7 -> BridgeRepair(), 8 -> AntennaPositionAnalyser(), 9 -> DiskFragmenter(), 10 -> TrailFinder(),
     11 -> PebbleTransformation(), 12 -> FenceCalculator(), 13 -> ClawMachinePlayer(), 14 -> RobotSimulator(), 15 -> WarehouseRobot(),
     16 -> ReindeerMinRoute(), 17 -> ByteComputer17(), 18 -> MemoryMaze(), 19 -> StripePatterns(), 20 -> RaceCondition(),
-    21 -> Day21Solver(), 22 -> Day22Solver(), 23 -> Day0Solver(), 24 -> Day0Solver(), 25 -> Day0Solver()
+    21 -> RoboticArmController(), 22 -> RandomNumberSimulator(), 23 -> Day0Solver(), 24 -> Day0Solver(), 25 -> Day0Solver()
 )
 
 val results = Map(

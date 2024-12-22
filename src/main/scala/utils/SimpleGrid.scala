@@ -235,6 +235,10 @@ object SimpleGrid {
 
         def fromArrow(arrow: Char): Direction =
             Direction.values.find(d => d.symbol == arrow).getOrElse(throw AoCException(s"invalid direction [$arrow]"))
+
+        def fromIncr(increment: (Int, Int)): Direction =
+            Direction.values.find(d => d.incr == increment).getOrElse(throw AoCException(s"invalid direction [$increment]"))
+
     }
 
     def compareYX(point1: (Int, Int), point2: (Int, Int)): Boolean = {
