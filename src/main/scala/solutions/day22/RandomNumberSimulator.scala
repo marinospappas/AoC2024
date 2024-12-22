@@ -4,6 +4,8 @@ package solutions.day22
 import framework.{InputReader, PuzzleSolver}
 import solutions.day22.RandomNumberSimulator.{mix, prune}
 
+import scala.collection.mutable.ArrayBuffer
+
 class RandomNumberSimulator extends PuzzleSolver {
 
     val inputData: Vector[Int] = InputReader.read(22).map( _.toInt )
@@ -31,8 +33,25 @@ class RandomNumberSimulator extends PuzzleSolver {
         currentSecret
     }
 
+    var secretNumbers: Vector[Long] = Vector.empty
+
+    def generateDifferences(seed: Long, n: Int): Vector[(Int, Int)] = {
+        var currentSecret = seed
+        val firstDigits = ArrayBuffer[Int]((seed % 10).toInt)
+        val differences = ArrayBuffer[Int](0)
+        val result = ArrayBuffer[(Int, Int)](((seed % 10).toInt, 0))
+        for i <- 1 to n do {
+            val newSecret = generateNextNumber(currentSecret)
+            val newDigit = (newSecret % 10).toInt
+            result += ((newDigit, newDigit - result.last._1))
+            currentSecret = newSecret
+        }
+        result.toVector
+    }
+
     override def part1: Any =
-        inputData.map(generateNthNumber(_, 2000)).sum
+        secretNumbers = inputData.map(generateNthNumber(_, 2000))
+        secretNumbers.sum
 
 
     override def part2: Any =

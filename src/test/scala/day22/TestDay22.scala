@@ -38,7 +38,12 @@ class TestDay22 extends AnyFlatSpec {
     }
 
     it should "solve part1 correctly" in {
-        solver.part1 shouldBe 37327623
+        (solver.part1, solver.secretNumbers) shouldBe (37327623, Vector(8685429, 4700978, 15273692, 8667524))
+    }
+
+    it should "generate differences between secret numbers" in {
+        val result = solver.generateDifferences(123, 9)
+        result.foreach(println)
     }
 
     it should "solve part2 correctly" in {
