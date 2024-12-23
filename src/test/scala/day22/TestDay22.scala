@@ -46,7 +46,13 @@ class TestDay22 extends AnyFlatSpec {
         result.foreach(println)
     }
 
+    it should "map differences to quantities" in {
+        val result = solver.generateDiffsToNumberMapping(solver.generateDifferences(123, 9))
+        result.foreach(println)
+    }
+
     it should "solve part2 correctly" in {
-        solver.part2 shouldBe 0
+        val solver = RandomNumberSimulator(Vector("1","2","3","2024"))
+        solver.part2 shouldBe ((-2,1,-1,3), 23)
     }
 }

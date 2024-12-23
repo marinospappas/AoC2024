@@ -4,11 +4,12 @@ package solutions.day22
 import framework.{InputReader, PuzzleSolver}
 import solutions.day22.RandomNumberSimulator.{mix, prune}
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class RandomNumberSimulator extends PuzzleSolver {
+class RandomNumberSimulator(testData: Vector[String] = Vector.empty) extends PuzzleSolver {
 
-    val inputData: Vector[Int] = InputReader.read(22).map( _.toInt )
+    val inputData: Vector[Int] = (if testData.nonEmpty then testData else InputReader.read(22)).map( _.toInt )
 
     // Calculate the result of multiplying the secret number by 64.
     // Then, mix this result into the secret number. Finally, prune the secret number.
@@ -49,13 +50,29 @@ class RandomNumberSimulator extends PuzzleSolver {
         result.toVector
     }
 
+    def generateDiffsToNumberMapping(diffs: Vector[(Int, Int)]): Vector[((Int, Int, Int, Int), Int)] = {
+        val result: ArrayBuffer[((Int, Int, Int, Int), Int)] = ArrayBuffer()
+        for i <- 4 until diffs.length do
+            result += (((diffs(i-3)._2, diffs(i-2)._2, diffs(i-1)._2, diffs(i)._2), diffs(i)._1))
+        result.toVector
+    }
+
     override def part1: Any =
         secretNumbers = inputData.map(generateNthNumber(_, 2000))
         secretNumbers.sum
 
 
     override def part2: Any =
-        0
+        val diffs = inputData.map( generateDifferences(_, 2000) )
+        val diffsToNumMappings = diffs.map( diff =>
+            val diffsToNumList = generateDiffsToNumberMapping(diff)
+            val diffsToNumMap = mutable.Map[(Int,Int,Int,Int), Int]()
+            diffsToNumList.foreach( d => if !diffsToNumMap.contains(d._1) then diffsToNumMap(d._1) = d._2)
+            diffsToNumMap
+        )
+        val diffToNum = mutable.Map[(Int,Int,Int,Int), Int]().withDefault(_ => 0)
+        diffsToNumMappings.flatten.foreach(e => diffToNum(e._1) += e._2)
+        diffToNum.maxBy(_._2)
 }
 
 object RandomNumberSimulator {
