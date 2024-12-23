@@ -93,7 +93,7 @@ class Dijkstra[T](g: Graph[T]) {
         while !queue.isEmpty do {
             curPath = queue.poll()
             val lastNode = curPath.last
-            if lastNode._1 == start then
+            if lastNode._1 == start && lastNode._2 > 0 then
                 allPaths += curPath
             else
                 predecessors(lastNode._1).foreach(predecessor =>
