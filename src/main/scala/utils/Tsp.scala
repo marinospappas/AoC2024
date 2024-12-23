@@ -8,15 +8,15 @@ class Tsp[T](g: Graph[T]) {
     def tspMinPath(start: T, returnToStart: Boolean = false): MinCostPath[T] =
         iterations = 0
         val minCostPath = MinCostPath[T]()
-        minCostPath.path = tsp(start, g.getNodes.filter(_ != start), List((start, 0)), returnToStart)
+        minCostPath.path = tsp(start, g.getNodes.filter(_ != start), Vector((start, 0)), returnToStart).toList
         minCostPath.minCost = minCostPath.path.map(_._2).sum
         minCostPath.numberOfIterations = iterations
         minCostPath
 
     private def tsp(start: T,
-                           destinations: List[T],
-                           path: List[(T, Int)],
-                           returnToStart: Boolean = false): List[(T, Int)] =
+                           destinations: Vector[T],
+                           path: Vector[(T, Int)],
+                           returnToStart: Boolean = false): Vector[(T, Int)] =
         var curPath = path
         if (destinations.size == 1)
             curPath = curPath :+ (destinations.head, g.getCost(start, destinations.head))

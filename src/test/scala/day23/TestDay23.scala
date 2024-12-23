@@ -25,10 +25,11 @@ class TestDay23 extends AnyFlatSpec {
     }
 
     it should "solve part1 correctly" in {
-        solver.part1 shouldBe 7
+        (solver.part1, solver.connected3.size) shouldBe (7, 12)
     }
 
     it should "solve part2 correctly" in {
-        solver.part2 shouldBe 0
+        solver.part1
+        solver.part2 shouldBe "co,de,ka,ta"
     }
 }

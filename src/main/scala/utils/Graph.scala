@@ -23,7 +23,7 @@ open class Graph[T](
 
     def get(id: T): mutable.Map[T, Int] = nodes(id)
 
-    def getNodes: List[T] = nodes.keys.toList
+    def getNodes: Vector[T] = nodes.keys.toVector
 
     def getNodesAndConnections: List[(T, mutable.Map[T, Int])] = nodes.toList
 
