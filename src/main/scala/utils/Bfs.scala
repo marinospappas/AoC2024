@@ -37,7 +37,7 @@ class Bfs[T](g: Graph[T]) {
         while !queue.isEmpty do {
             curPath = queue.removeFirst()
             val lastNode = curPath(curPath.size - 1)
-            if isAtEnd(lastNode) then   // found path
+            if isAtEnd(lastNode) && curPath.size > 1 then   // found path
                 allPaths += curPath
             else
                 g.getConnected(lastNode).map ( _._1 ).foreach ( connectedNode =>

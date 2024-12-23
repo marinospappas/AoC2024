@@ -18,8 +18,14 @@ class TestDay23 extends AnyFlatSpec {
         solver.inputData.size shouldBe 32
     }
 
+    it should "identify groups of 3 connected computers" in {
+        val result = solver.findConnectedN(3)
+        result.foreach(println)
+        (result.size, result.forall( _.size == 3 )) shouldBe (12, true)
+    }
+
     it should "solve part1 correctly" in {
-        solver.part1 shouldBe 0
+        solver.part1 shouldBe 7
     }
 
     it should "solve part2 correctly" in {

@@ -1,7 +1,7 @@
 package org.mpdev.scala.aoc2024
 package graph
 
-import utils.{DjikstraV0, Graph}
+import utils.{Dijkstra, DjikstraV0, Graph}
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -21,13 +21,26 @@ class TestDijkstra extends AnyFlatSpec {
         graph.addNodesWithCost("5", Set( ("6", 2) ))
         graph.addNodesWithCost("6", Set( ("7", 1) ))
         graph.addNodesWithCost("7", Set())
-        graph.printIt()
+    }
+    it should "find minimum path in simple graph" in {
+        println(graph)
+        val result = Dijkstra[String](graph).minPath("1", id => id == "7")
+        println(result)
+        (result.head._2, result.size) shouldBe (7, 5)
     }
 
-    it should "find minimum path in simple graph" in {
-        val result = DjikstraV0[String](graph).minPath("1", id => id == "7")
-        result.printPath()
-        (result.minCost, result.path.size) shouldBe (7, 5)
+    val graph1: Graph[String] = Graph()
+    {
+        graph1.addNode("A", "B", true)
+        graph1.addNode("B", "C", true)
+        graph1.addNode("C", "A", true)
     }
+    it should "find paths that ends in start" in {
+        println(graph1)
+        val result = Dijkstra[String](graph1).allPaths("A", id => id == "A")
+        println(result)
+        //(result.head., result.size) shouldBe (3, 4)
+    }
+
     
 }
