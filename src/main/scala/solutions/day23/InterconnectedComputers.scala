@@ -2,13 +2,11 @@ package org.mpdev.scala.aoc2024
 package solutions.day23
 
 import framework.{InputReader, PuzzleSolver}
-import solutions.day23.InterconnectedComputers.readCnx
+import solutions.day23.InterconnectedComputers.{containsAll, readCnx}
 import utils.Graph
 
-import java.util
 import scala.collection.immutable.HashSet
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 import scala.util.boundary
 import scala.util.boundary.break
 
@@ -19,57 +17,47 @@ class InterconnectedComputers extends PuzzleSolver {
     {
         inputData.foreach(pair => graph.addNode(pair._1, pair._2, true))
     }
+    val connections: Set[Set[String]] = Set.from(inputData.map( x => Set(x._1, x._2)))
+    val allIds: Set[String] = connections.map( _.head )
 
-    def findConnectedN(n: Int): Set[HashSet[String]] = {
-        val result = mutable.Set[HashSet[String]]()
-        for node <- graph.getNodes do {
-            val stack = util.Stack[ArrayBuffer[String]]()
-            stack.push(ArrayBuffer(node))
-            while !stack.isEmpty do {
-                val currentPath = stack.pop()
-                if currentPath.head == currentPath.last && currentPath.size == n + 1 then
-                    result.add(HashSet.from(currentPath.slice(0, n)))
-                else {
-                    graph.getConnected(currentPath.last).foreach( connected =>
-                        if currentPath.size <= n then {
-                            val newPath = currentPath :+ connected._1
-                            stack.push(newPath)
-                        }
-                    )
+    var connectionsN: Set[Set[String]] = Set.from(connections)
+    var groupSize: Int = 2
+
+    def findConnectedSetsN(n: Int): Unit = {
+        boundary:
+            while groupSize < n do {
+                val result = mutable.Set[Set[String]]()
+                for conx <- connectionsN do {
+                    for id <- allIds -- conx do
+                        if conx.forall(c => connections.contains(Set(id, c))) then
+                            result.add(conx + id)
                 }
+                if result.isEmpty then break()
+                connectionsN = Set.from(result)
+                groupSize += 1
+                println(s"group size: $groupSize")
             }
-        }
-        result.toSet
     }
 
-    var connected3: Set[HashSet[String]] = Set()
-
-    override def part1: Any =
-        connected3 = findConnectedN(3)
-        connected3.count( set => set.exists(_.startsWith("t")) )
+    override def part1: Any = {
+        findConnectedSetsN(3)
+        connectionsN.count(set => set.exists(_.startsWith("t")))
+    }
 
     override def part2: Any = {
-        var setOfConnectedSets = Set.from(connected3.filter( set => set.exists(_.startsWith("t") ) ) )
-        val newSetOfConnectedSets = mutable.Set[HashSet[String]]()
-        boundary:
-            while setOfConnectedSets.size > 1 do {
-                for connectedSet <- setOfConnectedSets do {
-                    print(s"${connectedSet.size}...")
-                    val remainingComputers = graph.getNodes.toSet -- connectedSet
-                    remainingComputers.foreach(comp =>
-                        if !connectedSet.contains(comp) && connectedSet.intersect(graph.getConnected(comp).map(_._1)) == connectedSet then
-                            newSetOfConnectedSets.add(connectedSet + comp)
-                    )
-                }
-                setOfConnectedSets = HashSet.from(newSetOfConnectedSets)
-            }
-        setOfConnectedSets.toList.head.toList.sorted.mkString(",")
+        findConnectedSetsN(connectionsN.size)
+        connectionsN.flatten.toList.sorted.mkString(",")
     }
 
 }
 
 object InterconnectedComputers {
 
+    extension (set: Set[String])
+        def containsAll(strings: Set[String]): Boolean =
+            strings.forall(set.contains)
+
+    // input parsing
     private def readCnx(s: String): (String, String) =
         s match { case s"${s1}-${s2}" => (s1, s2) }
 

@@ -14,18 +14,18 @@ class TestDay23 extends AnyFlatSpec {
 
     it should "read input and setup grid of computers" in {
         solver.inputData.foreach(println(_))
-        println(solver.graph)
-        solver.inputData.size shouldBe 32
+        solver.connections.foreach(println)
+        (solver.inputData.size, solver.connections.size, solver.allIds.size) shouldBe (32, 32, 16)
     }
 
     it should "identify groups of 3 connected computers" in {
-        val result = solver.findConnectedN(3)
-        result.foreach(println)
-        (result.size, result.forall( _.size == 3 )) shouldBe (12, true)
+        solver.findConnectedSetsN(3)
+        solver.connectionsN.foreach(println)
+        (solver.connectionsN.size, solver.connectionsN.forall( _.size == 3 )) shouldBe (12, true)
     }
 
     it should "solve part1 correctly" in {
-        (solver.part1, solver.connected3.size) shouldBe (7, 12)
+        (solver.part1, solver.connectionsN.size) shouldBe (7, 12)
     }
 
     it should "solve part2 correctly" in {
