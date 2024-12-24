@@ -2,8 +2,7 @@ package org.mpdev.scala.aoc2024
 package solutions.day23
 
 import framework.{InputReader, PuzzleSolver}
-import solutions.day23.InterconnectedComputers.{containsAll, readCnx}
-import utils.Graph
+import solutions.day23.InterconnectedComputers.readCnx
 
 import scala.collection.immutable.HashSet
 import scala.collection.mutable
@@ -13,15 +12,11 @@ import scala.util.boundary.break
 class InterconnectedComputers extends PuzzleSolver {
 
     val inputData: Vector[(String, String)] = InputReader.read(23).map( readCnx )
-    val graph: Graph[String] = Graph()
-    {
-        inputData.foreach(pair => graph.addNode(pair._1, pair._2, true))
-    }
     val connections: Set[Set[String]] = Set.from(inputData.map( x => Set(x._1, x._2)))
     val allIds: Set[String] = connections.map( _.head )
 
     var connectionsN: Set[Set[String]] = Set.from(connections)
-    var groupSize: Int = 2
+    private var groupSize: Int = 2
 
     def findConnectedSetsN(n: Int): Unit = {
         boundary:

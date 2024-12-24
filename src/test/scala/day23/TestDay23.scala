@@ -12,7 +12,7 @@ class TestDay23 extends AnyFlatSpec {
     AocMain.environment = "test"
     private val solver = InterconnectedComputers()
 
-    it should "read input and setup grid of computers" in {
+    it should "read input and setup grid of connected computers" in {
         solver.inputData.foreach(println(_))
         solver.connections.foreach(println)
         (solver.inputData.size, solver.connections.size, solver.allIds.size) shouldBe (32, 32, 16)
