@@ -20,12 +20,12 @@ class TestDay23 extends AnyFlatSpec {
 
     it should "identify groups of 3 connected computers" in {
         solver.findConnectedSetsN(3)
-        solver.connectionsN.foreach(println)
-        (solver.connectionsN.size, solver.connectionsN.forall( _.size == 3 )) shouldBe (12, true)
+        solver.connectedGroupsN.foreach(println)
+        (solver.connectedGroupsN.size, solver.connectedGroupsN.forall( _.size == 3 )) shouldBe (12, true)
     }
 
     it should "solve part1 correctly" in {
-        (solver.part1, solver.connectionsN.size) shouldBe (7, 12)
+        (solver.part1, solver.connectedGroupsN.size) shouldBe (7, 12)
     }
 
     it should "solve part2 correctly" in {
