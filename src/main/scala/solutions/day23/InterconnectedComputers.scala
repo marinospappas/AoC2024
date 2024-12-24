@@ -47,11 +47,6 @@ class InterconnectedComputers extends PuzzleSolver {
 }
 
 object InterconnectedComputers {
-
-    extension (set: Set[String])
-        def containsAll(strings: Set[String]): Boolean =
-            strings.forall(set.contains)
-
     // input parsing
     private def readCnx(s: String): (String, String) =
         s match { case s"${s1}-${s2}" => (s1, s2) }
