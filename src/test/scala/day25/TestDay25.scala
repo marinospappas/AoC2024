@@ -19,12 +19,6 @@ class TestDay25 extends AnyFlatSpec {
         println("Keys")
         solver.keys.foreach(println)
         solver.keyCombinations.foreach(println)
-        println("Key 0")
-        println(solver.keys(0))
-        println("Columns")
-        for i <- 0 to 4 do println(solver.keys(0).getColumn(i))
-        println("rows")
-        for i <- 0 to 6 do println(solver.keys(0).getRow(i))
         (solver.locks.size, solver.keys.size) shouldBe (3, 2)
     }
 
@@ -32,7 +26,4 @@ class TestDay25 extends AnyFlatSpec {
         solver.part1 shouldBe 3
     }
 
-    it should "solve part2 correctly" in {
-        solver.part2 shouldBe 0
-    }
 }

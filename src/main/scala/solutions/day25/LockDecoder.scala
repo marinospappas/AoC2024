@@ -17,16 +17,13 @@ class LockDecoder extends PuzzleSolver {
     val lockCombinations: Vector[Vector[Int]] = locks.map(g => (0 until numColumns).map(x => g.getColumn(x).count( _ == '#' )).toVector )
     val keyCombinations: Vector[Vector[Int]] = keys.map(g => (0 until numColumns).map(x => g.getColumn(x).count( _ == '#' )).toVector )
 
-    def keyFits(keyCombi: Vector[Int], lockCombi: Vector[Int]): Boolean =
+    private def keyFits(keyCombi: Vector[Int], lockCombi: Vector[Int]): Boolean =
         (0 until numColumns).forall( i => keyCombi(i) + lockCombi(i) <= LOCK_HEIGHT)
 
     override def part1: Any = {
-        val validCombis = mutable.Set[(Vector[Int], Vector[Int])]()
-        for key <- keyCombinations do
-            for lock <- lockCombinations do
-                if keyFits(key, lock) then
-                    validCombis.add((key, lock))
-        validCombis.size
+        (for key <- keyCombinations yield
+            for lock <- lockCombinations if keyFits(key, lock)
+                yield (key, lock)).flatten.size
     }
 
     override def part2: Any =
