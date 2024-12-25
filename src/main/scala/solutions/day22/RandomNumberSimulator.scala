@@ -57,22 +57,23 @@ class RandomNumberSimulator(testData: Vector[String] = Vector.empty) extends Puz
         result.toVector
     }
 
-    override def part1: Any =
+    override def part1: Any = {
         secretNumbers = inputData.map(generateNthNumber(_, 2000))
         secretNumbers.sum
-
-
-    override def part2: Any =
-        val diffs = inputData.map( generateDifferences(_, 2000) )
-        val diffsToNumMappings = diffs.map( diff =>
+    }
+    
+    override def part2: Any = {
+        val diffs = inputData.map(generateDifferences(_, 2000))
+        val diffsToNumMappings = diffs.map(diff =>
             val diffsToNumList = generateDiffsToNumberMapping(diff)
-            val diffsToNumMap = mutable.Map[(Int,Int,Int,Int), Int]()
-            diffsToNumList.foreach( d => if !diffsToNumMap.contains(d._1) then diffsToNumMap(d._1) = d._2)
+            val diffsToNumMap = mutable.Map[(Int, Int, Int, Int), Int]()
+            diffsToNumList.foreach(d => if !diffsToNumMap.contains(d._1) then diffsToNumMap(d._1) = d._2)
             diffsToNumMap
         )
-        val diffToNum = mutable.Map[(Int,Int,Int,Int), Int]().withDefault(_ => 0)
+        val diffToNum = mutable.Map[(Int, Int, Int, Int), Int]().withDefault(_ => 0)
         diffsToNumMappings.flatten.foreach(e => diffToNum(e._1) += e._2)
         diffToNum.maxBy(_._2)
+    }
 }
 
 object RandomNumberSimulator {

@@ -61,7 +61,7 @@ open class SimpleGrid(gridData: Vector[String]) {
             if data(y)(x) == d
         } yield (x, y)).toSet
 
-    def getColumn(x: Int): Vector[Char] = (0 to maxY).map( data(x)(_)).toVector
+    def getColumn(x: Int): Vector[Char] = (0 to maxY).map( data(_)(x) ).toVector
 
     def getRow(y: Int): Vector[Char] = data(y).toVector
 

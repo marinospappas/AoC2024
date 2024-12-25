@@ -41,6 +41,7 @@ class TestDay22 extends AnyFlatSpec {
         (solver.part1, solver.secretNumbers) shouldBe (37327623, Vector(8685429, 4700978, 15273692, 8667524))
     }
 
+    // TODO complete below tests
     it should "generate differences between secret numbers" in {
         val result = solver.generateDifferences(123, 9)
         result.foreach(println)

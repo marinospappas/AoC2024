@@ -2,16 +2,49 @@ package org.mpdev.scala.aoc2024
 package solutions.day24
 
 import framework.{InputReader, PuzzleSolver}
+import solutions.day24.LogicalCircuit.{readGate, readInput}
+import solutions.day24.Gate.{AND, OR, XOR}
 
-import solutions.day24.LogicalCircuit.readInput
+class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
 
-class LogicalCircuit extends PuzzleSolver {
-
-    val inputData: Vector[String] = InputReader.read(24)
+    val inputData: Vector[String] = if testData.isEmpty then InputReader.read(24) else testData
     val inputSignals: Map[String, Int] = inputData.splitAt(inputData.indexOf(""))._1.map( readInput ).toMap
+    val gates: Map[String, Gate] = inputData.splitAt(inputData.indexOf("") + 1)._2.map( readGate )
+        .map(g => (g.id, g)).toMap
+    val outputs: Vector[String] = gates.values.map( _.id ).filter( _.startsWith("z") ).toVector.sorted.reverse
+
+    def calculateCircuitOutput(id: String, input: Map[String, Int]): Int = {
+        if input.contains(id) then
+            input(id)
+        else {
+            val gate = gates(id)
+            gate.function(calculateCircuitOutput(gate.input1, input), calculateCircuitOutput(gate.input2, input))
+        }
+    }
+
+    def checkOutputForBit(id: String): Boolean = {
+        val wire1 = id.replace("z", "x")
+        val wire2 = id.replace("z", "y")
+        for (inp1, inp2) <- Set((0, 0), (0, 1), (1, 0), (1, 1))
+            yield inp1 + inp2
+        true
+    }
+
+    def printCircuit(output: String, indent: String): Unit = {
+        if inputSignals.contains(output) then println(s"$indent$output")
+        else
+            println(s"$indent${gates(output)}")
+            printCircuit(gates(output).input1, indent + "  ")
+            printCircuit(gates(output).input2, indent + "  " )
+    }
+
+    def printCircuit(): Unit =
+        for bit <- outputs.reverse do
+            printCircuit(bit, "")
+            println()
 
     override def part1: Any =
-        0
+        java.lang.Long.parseLong(outputs.map( calculateCircuitOutput(_, inputSignals) ).mkString, 2)
 
     override def part2: Any =
         0
@@ -24,9 +57,14 @@ object LogicalCircuit {
         val matched = """([xy]\d{2}): (\d)""".r.findFirstMatchIn(s).get
         (matched.group(1), matched.group(2).toInt)
 
-    private def readGate(s: String): (Int, Int) =
-        s match { case s"Prize: X=${p1}, Y=${p2}" => (p1.toInt, p2.toInt) }
-
+    private def readGate(s: String): Gate = {
+        val matched = """([a-z0-9]+) (AND|OR|XOR) ([a-z0-9]+) -> ([a-z0-9]+)""".r.findFirstMatchIn(s).get
+        val (in1, in2, out) = (matched.group(1), matched.group(3), matched.group(4))
+        matched.group(2) match
+            case "AND" => AND(out, in1, in2)
+            case "OR" => OR(out, in1, in2)
+            case "XOR" => XOR(out, in1, in2)
+    }
 }
 
 /*
