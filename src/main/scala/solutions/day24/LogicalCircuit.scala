@@ -77,6 +77,7 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
     private def swapOutput(inputData: Vector[String], str1: String, str2: String): Vector[String] =
         inputData.map( s =>
             val a = s.split(" -> ")
+            //TODO use match / case
 //            a(1) match
 //                case str1 => s"${a(0)} -> $str2"
 //                case str2 => s"${a(0)} -> $str1"
@@ -86,6 +87,11 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
             else s"${a(0)} -> ${a(1)}"
         )
 
+    // the below algorithm is based on the bit adder circuit that adds 2 1-bit numbers with carry bit:
+    // input bits: x, y and carry_in
+    // output bit: sum and carry_out
+    // sum = (x XOR y) XOR carry_in
+    // carry_out = (x AND y) OR ((x XOR y) AND carry_in)
     def inspectCircuit: Set[String] = {
         val swappedConnections = mutable.Set[String]()
         var bit = 0
