@@ -1,13 +1,11 @@
 package org.mpdev.scala.aoc2024
 package solutions.day24
 
-import framework.{AoCException, InputReader, PuzzleSolver}
+import framework.{InputReader, PuzzleSolver}
 import solutions.day24.LogicalCircuit.{And, Or, Xor, readGate, readInput}
 import solutions.day24.Gate.{AND, NONE, OR, XOR}
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
-import scala.util.boundary
 import scala.util.control.Breaks.{break, breakable}
 
 class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
@@ -77,14 +75,10 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
     private def swapOutput(inputData: Vector[String], str1: String, str2: String): Vector[String] =
         inputData.map( s =>
             val a = s.split(" -> ")
-            //TODO use match / case
-//            a(1) match
-//                case str1 => s"${a(0)} -> $str2"
-//                case str2 => s"${a(0)} -> $str1"
-//                case _ => s"${a(0)} -> ${a(1)}"
-            if a(1) == str1 then s"${a(0)} -> $str2"
-            else if a(1) == str2 then s"${a(0)} -> $str1"
-            else s"${a(0)} -> ${a(1)}"
+            a(1) match
+                case s: String if s == str1 => s"${a(0)} -> $str2"
+                case s: String if s == str2 => s"${a(0)} -> $str1"
+                case _ => s"${a(0)} -> ${a(1)}"
         )
 
     // the below algorithm is based on the bit adder circuit that adds 2 1-bit numbers with carry bit:
