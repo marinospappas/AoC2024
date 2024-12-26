@@ -89,38 +89,36 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
     def inspectCircuit: Set[String] = {
         val swappedConnections = mutable.Set[String]()
         var bit = 0
-        var carryGate = ""
         var input = inputForCircuit
         var circuit = input.map( readGate ).map(g => (g.id, g)).toMap
+        var carryGate = ""
         while bit < outputs.size - 1 do {
             breakable {
-                val x = f"x$bit%02d"
-                val y = f"y$bit%02d"
-                val z = f"z$bit%02d"
-
+                val (x, y, z) = (f"x$bit%02d", f"y$bit%02d", f"z$bit%02d")
                 if bit == 0 then
                     carryGate = identifyGate("x00", "y00", And, circuit)
+                    bit += 1
                 else {
                     val (xyXorGate, xyAndGate) = (identifyGate(x, y, Xor, circuit), identifyGate(x, y, And, circuit))
                     val sumGate = identifyGate(carryGate, xyXorGate, Xor, circuit)
-                    if sumGate == "" then {
-                        swappedConnections.addAll(Set(xyXorGate, xyAndGate))
-                        input = swapOutput(input, xyXorGate, xyAndGate)
-                        circuit = input.map( readGate ).map(g => (g.id, g)).toMap
-                        bit = 0
-                        break
-                    }
-                    if sumGate != z then {
-                        swappedConnections.addAll(Set(z, sumGate))
-                        input = swapOutput(input, sumGate, z)
-                        circuit = input.map( readGate ).map(g => (g.id, g)).toMap
-                        bit = 0
-                        break
-                    }
+                    sumGate match
+                        case "" =>
+                            swappedConnections.addAll(Set(xyXorGate, xyAndGate))
+                            input = swapOutput(input, xyXorGate, xyAndGate)
+                            circuit = input.map( readGate ).map(g => (g.id, g)).toMap
+                            bit = 0
+                            break
+                        case id: String if id != z =>
+                            swappedConnections.addAll(Set(z, sumGate))
+                            input = swapOutput(input, sumGate, z)
+                            circuit = input.map( readGate ).map(g => (g.id, g)).toMap
+                            bit = 0
+                            break
+                        case _ => ;
                     val xyAndCarryGate = identifyGate(carryGate, xyXorGate, And, circuit)
                     carryGate = identifyGate(xyAndCarryGate, xyAndGate, Or, circuit)
+                    bit += 1
                 }
-                bit += 1
             }
         }
         swappedConnections.toSet
