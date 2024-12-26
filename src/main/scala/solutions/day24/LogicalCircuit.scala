@@ -110,16 +110,14 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
                     val (xyXorGate, xyAndGate) = (identifyGate(x, y, Xor, circuit), identifyGate(x, y, And, circuit))
                     val sumGate = identifyGate(carryGate, xyXorGate, Xor, circuit)
                     if sumGate == "" then {
-                        swappedConnections.add(xyXorGate)
-                        swappedConnections.add(xyAndGate)
+                        swappedConnections.addAll(Set(xyXorGate, xyAndGate))
                         input = swapOutput(input, xyXorGate, xyAndGate)
                         circuit = input.map( readGate ).map(g => (g.id, g)).toMap
                         bit = 0
                         break
                     }
                     if sumGate != z then {
-                        swappedConnections.add(z)
-                        swappedConnections.add(sumGate)
+                        swappedConnections.addAll(Set(z, sumGate))
                         input = swapOutput(input, sumGate, z)
                         circuit = input.map( readGate ).map(g => (g.id, g)).toMap
                         bit = 0
@@ -149,7 +147,7 @@ object LogicalCircuit {
 
     // input parsing
     private def readInput(s: String): (String, Int) =
-        val matched = """([xy]\d{2}): (\d)""".r.findFirstMatchIn(s).getOrElse(throw AoCException(s"could not match $s"))
+        val matched = """([xy]\d{2}): (\d)""".r.findFirstMatchIn(s).get
         (matched.group(1), matched.group(2).toInt)
 
     private def readGate(s: String): Gate = {
