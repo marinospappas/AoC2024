@@ -13,6 +13,7 @@ enum Gate(val id: String, val input1: String, val input2: String, val function: 
     case XOR(override val id: String, override val input1: String, override val input2: String) extends Gate(
         id, input1, input2, (in1, in2) => in1 ^ in2
     )
+    case NONE extends Gate("", "", "", (_,_) => 0)
 }
 
 abstract class Gate1(val id: String) {

@@ -1,7 +1,7 @@
 package org.mpdev.scala.aoc2024
 package day24
 
-import framework.AocMain
+import framework.{AocMain, InputReader}
 import solutions.day24.LogicalCircuit
 
 import org.scalatest.flatspec.AnyFlatSpec
@@ -9,7 +9,7 @@ import org.scalatest.matchers.should.Matchers.*
 
 class TestDay24 extends AnyFlatSpec {
 
-    AocMain.environment = "prod"
+    AocMain.environment = "test"
     private val solver = LogicalCircuit()
 
     it should "read input and setup logical circuit" in {
@@ -44,24 +44,16 @@ class TestDay24 extends AnyFlatSpec {
         solver.part1 shouldBe 2024
     }
 
-    it should "print diagram of circuit" in {
+    it should "print diagram of circuit and inspect" in {
+        val solver = LogicalCircuit(InputReader.read(24, "src/main/resources/input/input"))
         solver.printCircuit()
+        println(solver.inspectCircuit)
     }
 
     it should "verify correct sum and carry for each bit" in {
         val validBits = solver.outputs.reverse.map( out => solver.checkOutputForBit(out, solver.gates) )
         validBits.zipWithIndex.foreach(println)
-
         solver.printCircuit("z05", "")
         solver.printCircuit("z06", "")
-        val gates5 = solver.getAllGatesForBit("z05")
-        val gates6 = solver.getAllGatesForBit("z06")
-        println(s"additional gates between bits 5 and 6: ${gates6.toSet -- gates5.toSet}")
-
-        println(solver.findReversedPair(Set("png", "dhs", "kbj", "vcv"), "z06"))
-    }
-
-    it should "solve part2 correctly" in {
-        solver.part2 shouldBe 0
     }
 }

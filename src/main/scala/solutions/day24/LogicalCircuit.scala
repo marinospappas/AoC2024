@@ -1,25 +1,24 @@
 package org.mpdev.scala.aoc2024
 package solutions.day24
 
-import framework.{InputReader, PuzzleSolver}
-import solutions.day24.LogicalCircuit.{readGate, readInput}
-import solutions.day24.Gate.{AND, OR, XOR}
+import framework.{AoCException, InputReader, PuzzleSolver}
+import solutions.day24.LogicalCircuit.{And, Or, Xor, readGate, readInput}
+import solutions.day24.Gate.{AND, NONE, OR, XOR}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.boundary
-import scala.util.boundary.break
+import scala.util.control.Breaks.{break, breakable}
 
 class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
 
     val inputData: Vector[String] = if testData.isEmpty then InputReader.read(24) else testData
+    private val inputForCircuit = inputData.splitAt(inputData.indexOf("") + 1)._2
     val inputSignals: Map[String, Int] = inputData.splitAt(inputData.indexOf(""))._1.map( readInput ).toMap
-    val gates: Map[String, Gate] = inputData.splitAt(inputData.indexOf("") + 1)._2.map( readGate )
-        .map(g => (g.id, g)).toMap
+    val gates: Map[String, Gate] = inputForCircuit.map( readGate ).map(g => (g.id, g)).toMap
     val outputs: Vector[String] = gates.values.map( _.id ).filter( _.startsWith("z") ).toVector.sorted.reverse
 
     def calculateCircuitOutput(id: String, input: Map[String, Int], gates: Map[String, Gate]): Int = {
-        //if input.contains(id) then
         if id.startsWith("x") || id.startsWith("y") then
             input(id)
         else {
@@ -28,6 +27,7 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
         }
     }
 
+    // was used only in the initial analysis of the circuit
     def checkOutputForBit(id: String, gates: Map[String, Gate]): Boolean = {
         val wire1 = id.replace("z", "x")
         val wire2 = id.replace("z", "y")
@@ -52,40 +52,6 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
             .flatten.flatten.forall( _ == true )
     }
 
-    def getAllGatesForBit(id: String): Vector[String] = {
-        val result = ArrayBuffer[String]()
-        result += id
-        if !inputSignals.contains(id) then {
-            result ++= getAllGatesForBit(gates(id).input1)
-            result ++= getAllGatesForBit(gates(id).input2)
-        }
-        result.sorted.reverse.toVector
-    }
-
-    private def reverseGates(gates: mutable.Map[String, Gate], pairToReverse: List[String]): Unit = {
-        val tempId = "____"
-//        gates.foreach( e => if e._2.input1 == pairToReverse.head then e._2.input1 = tempId)
-//        gates.foreach( e => if e._2.input2 == pairToReverse.head then e._2.input2 = tempId)
-//
-//        gates.foreach( e => if e._2.input1 == pairToReverse.last then e._2.input1 = pairToReverse.head)
-//        gates.foreach( e => if e._2.input2 == pairToReverse.last then e._2.input2 = pairToReverse.head)
-//
-//        gates.foreach( e => if e._2.input1 == tempId then e._2.input1 = pairToReverse.last)
-//        gates.foreach( e => if e._2.input2 == tempId then e._2.input2 = pairToReverse.last)
-    }
-
-    def findReversedPair(tryGates: Set[String], bit: String): List[String] = {
-        boundary:
-            tryGates.toList.combinations(2).foreach( gatesPair =>
-                val thisGates = mutable.Map.from(gates)
-                reverseGates(thisGates, gatesPair)
-                reverseGates(thisGates, (tryGates -- gatesPair.toSet).toList)
-                if checkOutputForBit(bit, thisGates.toMap)
-                    then break(gatesPair)
-            )
-            List()
-    }
-
     def printCircuit(output: String, indent: String): Unit = {
         if !inputSignals.contains(output) then {
             println(s"$indent${gates(output)}")
@@ -94,32 +60,98 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
         }
     }
 
+    // was used only in the initial analysis of the circuit
     def printCircuit(): Unit = {
         for bit <- outputs.reverse do
             printCircuit(bit, "")
             println()
     }
 
+    private def identifyGate(inp1: String, inp2: String, gateType: String, circuit: Map[String, Gate]): String = {
+        val gate = circuit.values
+            .find( gate => Set(gate.input1, gate.input2) == Set(inp1, inp2) && gate.getClass.getSimpleName == gateType)
+            .orElse(Option[Gate](NONE)).get.id
+        gate
+    }
+
+    private def swapOutput(inputData: Vector[String], str1: String, str2: String): Vector[String] =
+        inputData.map( s =>
+            val a = s.split(" -> ")
+//            a(1) match
+//                case str1 => s"${a(0)} -> $str2"
+//                case str2 => s"${a(0)} -> $str1"
+//                case _ => s"${a(0)} -> ${a(1)}"
+            if a(1) == str1 then s"${a(0)} -> $str2"
+            else if a(1) == str2 then s"${a(0)} -> $str1"
+            else s"${a(0)} -> ${a(1)}"
+        )
+
+    def inspectCircuit: Set[String] = {
+        val swappedConnections = mutable.Set[String]()
+        var bit = 0
+        var carryGate = ""
+        var input = inputForCircuit
+        var circuit = input.map( readGate ).map(g => (g.id, g)).toMap
+        while bit < outputs.size - 1 do {
+            breakable {
+                val x = f"x$bit%02d"
+                val y = f"y$bit%02d"
+                val z = f"z$bit%02d"
+
+                if bit == 0 then
+                    carryGate = identifyGate("x00", "y00", And, circuit)
+                else {
+                    val (xyXorGate, xyAndGate) = (identifyGate(x, y, Xor, circuit), identifyGate(x, y, And, circuit))
+                    val sumGate = identifyGate(carryGate, xyXorGate, Xor, circuit)
+                    if sumGate == "" then {
+                        swappedConnections.add(xyXorGate)
+                        swappedConnections.add(xyAndGate)
+                        input = swapOutput(input, xyXorGate, xyAndGate)
+                        circuit = input.map( readGate ).map(g => (g.id, g)).toMap
+                        bit = 0
+                        break
+                    }
+                    if sumGate != z then {
+                        swappedConnections.add(z)
+                        swappedConnections.add(sumGate)
+                        input = swapOutput(input, sumGate, z)
+                        circuit = input.map( readGate ).map(g => (g.id, g)).toMap
+                        bit = 0
+                        break
+                    }
+                    val xyAndCarryGate = identifyGate(carryGate, xyXorGate, And, circuit)
+                    carryGate = identifyGate(xyAndCarryGate, xyAndGate, Or, circuit)
+                }
+                bit += 1
+            }
+        }
+        swappedConnections.toSet
+    }
+
     override def part1: Any =
         java.lang.Long.parseLong(outputs.map( calculateCircuitOutput(_, inputSignals, gates) ).mkString, 2)
 
     override def part2: Any =
-        0
+        inspectCircuit.toList.sorted.mkString(",")
 }
 
 object LogicalCircuit {
 
+    val Or = "OR"
+    val And = "AND"
+    val Xor = "XOR"
+
     // input parsing
     private def readInput(s: String): (String, Int) =
-        val matched = """([xy]\d{2}): (\d)""".r.findFirstMatchIn(s).get
+        val matched = """([xy]\d{2}): (\d)""".r.findFirstMatchIn(s).getOrElse(throw AoCException(s"could not match $s"))
         (matched.group(1), matched.group(2).toInt)
 
     private def readGate(s: String): Gate = {
         val matched = """([a-z0-9]+) (AND|OR|XOR) ([a-z0-9]+) -> ([a-z0-9]+)""".r.findFirstMatchIn(s).get
         val (in1, in2, out) = (matched.group(1), matched.group(3), matched.group(4))
         matched.group(2) match
-            case "AND" => AND(out, in1, in2)
-            case "OR" => OR(out, in1, in2)
-            case "XOR" => XOR(out, in1, in2)
+            case And => AND(out, in1, in2)
+            case Or => OR(out, in1, in2)
+            case Xor => XOR(out, in1, in2)
     }
 }
