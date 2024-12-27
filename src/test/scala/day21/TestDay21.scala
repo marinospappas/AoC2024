@@ -31,7 +31,7 @@ class TestDay21 extends AnyFlatSpec {
         ('A', '2', "<^A"),
         ('A', '1', "^<<A"),
         ('4', 'A', ">>vvA"),
-        ('8', 'A', ">vvvA"),
+        ('8', 'A', "vvv>A"),
         ('3', '7', "<<^^A"),
         ('4', '0', ">vvA"),
     )
@@ -49,7 +49,7 @@ class TestDay21 extends AnyFlatSpec {
         ('A', 'v', "<vA"),
         ('A', '<', "v<<A"),
         ('^', 'A', ">A"),
-        ('v', 'A', ">^A"),
+        ('v', 'A', "^>A"),
         ('<', 'A', ">>^A"),
         ('<', '^', ">^A"),
         ('<', '>', ">>A"),
@@ -63,17 +63,17 @@ class TestDay21 extends AnyFlatSpec {
     }
 
     it should "map key code to 1st stage directions" in {
-        RoboticArmController.directionsForKeypad(solver.numKeysGrid, ENTER + "029A") shouldBe "<A^A>^^AvvvA"
+        RoboticArmController.directionsForKeypad(solver.numKeysGrid, ENTER + "029A") shouldBe "<A^A^^>AvvvA"
     }
 
     it should "map key code to 2nd stage directions" in {
         RoboticArmController.directionsForKeypad(solver.dirKeysGrid,
-            ENTER + RoboticArmController.directionsForKeypad(solver.numKeysGrid, "A" + "029A")) shouldBe "v<<A>>^A<A>AvA<^AA>A<vAAA>^A"
+            ENTER + RoboticArmController.directionsForKeypad(solver.numKeysGrid, "A" + "029A")) shouldBe "v<<A>>^A<A>A<AAv>A^A<vAAA^>A"
     }
 
     private val codeToFinalParams = Table(
         ("code", "expected"),
-        ("029A", "<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A"),
+        ("029A", "<vA<AA>>^AvAA<^A>Av<<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A"),
         ("980A", "<v<A>>^AAAvA^A<vA<AA>>^AvAA<^A>A<v<A>A>^AAAvA<^A>A<vA>^A<A>A"),
         ("179A", "<v<A>>^A<vA<A>>^AAvAA<^A>A<v<A>>^AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A"),
         ("456A", "<v<A>>^AA<vA<A>>^AAvAA<^A>A<vA>^A<A>A<vA>^A<A>A<v<A>A>^AAvA<^A>A"),
@@ -83,40 +83,13 @@ class TestDay21 extends AnyFlatSpec {
         forEvery(codeToFinalParams) { (code: String, expected: String) =>
             println(s"input: $code")
             println(s"expected: $expected")
-            val result = //solver.transform(code)
-                RoboticArmController.directionsForKeypad(solver.dirKeysGrid,
-                    ENTER + RoboticArmController.directionsForKeypad(solver.dirKeysGrid,
-                        ENTER + RoboticArmController.directionsForKeypad(solver.numKeysGrid, ENTER + code)))
+            val result = solver.transform(code)
+            //    RoboticArmController.directionsForKeypad(solver.dirKeysGrid,
+            //        ENTER + RoboticArmController.directionsForKeypad(solver.dirKeysGrid,
+            //            ENTER + RoboticArmController.directionsForKeypad(solver.numKeysGrid, ENTER + code)))
             println(s"result:   $result")
             result shouldBe expected
         }
-    }
-
-    it should "map directions back to key sequence" in {
-        val input = "<v<A>>^AAAvA^A<v<A>A<A>>^AvAA<^A>A<v<A>A>^AAAvA<^A>A<vA>^A<A>A"
-        val output1 = RoboticArmController.fromDirToKey(solver.dirKeysGrid, 'A', input)
-        println(s"input:  $input")
-        println(s"output1: $output1")
-        val output2 = RoboticArmController.fromDirToKey(solver.dirKeysGrid, 'A', output1)
-        println(s"output2: $output2")
-        val output3 = RoboticArmController.fromDirToKey(solver.numKeysGrid, 'A', output2)
-        println(s"output3: $output3")
-        output3 shouldBe "980A"
-    }
-
-    it should "find all possible combinations of directions from num.key to num.key" in {
-        val result = RoboticArmController.keyToKeyAllMovements(solver.numKeysGrid, 'A', '4')
-        println(result)
-    }
-
-    it should "find all possible combinations of directions from dir.key to dir.key" in {
-        val result = RoboticArmController.keyToKeyAllMovements(solver.dirKeysGrid, 'A', '<')
-        println(result)
-    }
-
-    it should "find the least number fo keystrokes for any digit combination" in {
-        val result = solver.numToNumMinMovements('A', '2')
-        println(result)
     }
 
     it should "solve part1 correctly" in {

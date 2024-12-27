@@ -97,7 +97,6 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
                 val (x, y, z) = (f"x$bit%02d", f"y$bit%02d", f"z$bit%02d")
                 if bit == 0 then
                     carryGate = identifyGate("x00", "y00", And, circuit)
-                    bit += 1
                 else {
                     val (xyXorGate, xyAndGate) = (identifyGate(x, y, Xor, circuit), identifyGate(x, y, And, circuit))
                     val sumGate = identifyGate(carryGate, xyXorGate, Xor, circuit)
@@ -117,8 +116,8 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
                         case _ => ;
                     val xyAndCarryGate = identifyGate(carryGate, xyXorGate, And, circuit)
                     carryGate = identifyGate(xyAndCarryGate, xyAndGate, Or, circuit)
-                    bit += 1
                 }
+                bit += 1
             }
         }
         swappedConnections.toSet
