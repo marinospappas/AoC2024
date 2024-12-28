@@ -4,7 +4,6 @@ package solutions.day23
 import framework.{InputReader, PuzzleSolver}
 import solutions.day23.InterconnectedComputers.readCnx
 
-import scala.collection.immutable.HashSet
 import scala.collection.mutable
 import scala.util.boundary
 import scala.util.boundary.break

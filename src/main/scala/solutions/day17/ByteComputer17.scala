@@ -11,7 +11,6 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.mutable.ArrayBuffer
 import scala.math.pow
 
-
 class ByteComputer17(var testData: Vector[String] = Vector()) extends PuzzleSolver {
 
     val inputData: Vector[String] = if (testData.nonEmpty) testData else InputReader.read(17)

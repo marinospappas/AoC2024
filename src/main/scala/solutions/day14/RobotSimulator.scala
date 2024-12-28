@@ -59,5 +59,4 @@ object RobotSimulator {
     // input parsing
     private def toRobot(s: String): Robot =
         s match { case s"p=${p1},${p2} v=${v1},${v2}" => Robot((p1.toInt, p2.toInt), (v1.toInt, v2.toInt)) }
-
 }
