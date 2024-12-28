@@ -6,7 +6,6 @@ import solutions.day24.LogicalCircuit.{And, Or, Xor, readGate, readInput}
 import solutions.day24.Gate.{AND, NONE, OR, XOR}
 
 import scala.collection.mutable
-import scala.util.control.Breaks.{break, breakable}
 
 class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
 
