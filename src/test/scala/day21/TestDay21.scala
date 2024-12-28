@@ -83,7 +83,7 @@ class TestDay21 extends AnyFlatSpec {
         forEvery(codeToFinalParams) { (code: String, expected: String) =>
             println(s"input: $code")
             println(s"expected: $expected")
-            val result = solver.transform(code)
+            val result = solver.transform1(code)
             //    RoboticArmController.directionsForKeypad(solver.dirKeysGrid,
             //        ENTER + RoboticArmController.directionsForKeypad(solver.dirKeysGrid,
             //            ENTER + RoboticArmController.directionsForKeypad(solver.numKeysGrid, ENTER + code)))
@@ -96,7 +96,12 @@ class TestDay21 extends AnyFlatSpec {
         solver.part1 shouldBe 126384
     }
 
-    it should "solve part2 correctly" in {
-        solver.part2 shouldBe 0
+    it should "calculate moves using algorithm for part2" in {
+        RoboticArmController.cache.clear()
+        val result = solver.keypadCodes.map( code =>
+            code.substring(0,3).toInt * solver.transform2(code, 3)
+        ).sum
+        RoboticArmController.cache.foreach(println)
+        result shouldBe 126384
     }
 }

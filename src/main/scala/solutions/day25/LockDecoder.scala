@@ -27,7 +27,7 @@ class LockDecoder extends PuzzleSolver {
     }
 
     override def part2: Any =
-        "Almost... End of AoC 2024 - Merry Christmas"
+        "End of AoC 2024 - Merry Christmas"
 }
 
 object LockDecoder {

@@ -2,11 +2,12 @@ package org.mpdev.scala.aoc2024
 package solutions.day21
 
 import framework.{InputReader, PuzzleSolver}
-import solutions.day21.RoboticArmController.{ENTER, dirKeypad, directionsForKeypad, fromKeyToKey, numKeyPad}
+import solutions.day21.RoboticArmController.{ENTER, dirKeypad, directionsForKeypad, directionsForKeypadLength, fromKeyToKey, numKeyPad}
 import utils.SimpleGrid.Direction
 import utils.{+, *}
 import utils.SimpleGrid.Direction.W
 
+import scala.collection.mutable
 import scala.math.abs
 import scala.util.boundary
 import scala.util.boundary.break
@@ -17,21 +18,25 @@ class RoboticArmController extends PuzzleSolver {
     val numKeysGrid = SimpleGrid(numKeyPad)
     val dirKeysGrid = SimpleGrid(dirKeypad)
 
-    def keySeqToDirections(s: String): String =
-        (ENTER + s).sliding(2)
-            .map( s => s.toDirectionsFromNumKeypad)
-            .mkString
+    // converts each code to movements for the human after the 2nd robot keypad
+    def transform1(s: String): String =
+        s.toDirectionsFromNumKeypad.toDirectionsFromDirKeypad.toDirectionsFromDirKeypad
 
     override def part1: Any =
         keypadCodes.map( code =>
-            code.substring(0,3).toInt * transform(code).length
+            code.substring(0,3).toInt * transform1(code).length
         ).sum
 
-    def transform(s: String): String =
-        s.toDirectionsFromNumKeypad.toDirectionsFromDirKeypad.toDirectionsFromDirKeypad
+    // converts each move (from-key, to-key) to number of keystrokes after n directional keypads
+    def transform2(code: String, n: Int): Long =
+        directionsForKeypadLength(dirKeysGrid, code.toDirectionsFromNumKeypad, n, 1)
 
-    override def part2: Any =
-        0
+    override def part2: Any = {
+        RoboticArmController.cache.clear()
+        keypadCodes.map(code =>
+            code.substring(0, 3).toInt * transform2(code, 26)
+        ).sum
+    }
 
     extension(s: String) {
         private def toDirectionsFromNumKeypad: String =
@@ -57,26 +62,44 @@ object RoboticArmController {
         " ^A",
         "<v>",
     )
+    val cache: mutable.Map[(Char, Char, Int), Long] = mutable.Map()
 
-    def directionsForKeypad(grid: SimpleGrid, sequence: String): String =
+    def directionsForKeypad(kpd: SimpleGrid, sequence: String): String =
         sequence.sliding(2)
-            .map(pair => fromKeyToKey(grid, pair.head, pair.last))
+            .map(pair => fromKeyToKey(kpd, pair.head, pair.last))
             .mkString
 
-    private def isValidMovement(grid: SimpleGrid, start: (Int, Int), directions: List[Char]): Boolean = {
+    private def directionsForKeypadLength(kpd: SimpleGrid, sequence: String, n: Int, current: Int): Long = {
+        if current == n then
+            sequence.length
+        else {
+            val pairs = (ENTER + sequence).sliding(2).toList
+            pairs.map( pair => if cache.contains((pair.head, pair.last, current))
+                then cache((pair.head, pair.last, current))
+                else {
+                    val seq = fromKeyToKey(kpd, pair.head, pair.last)
+                    val len = directionsForKeypadLength(kpd, seq, n, current + 1)
+                    cache((pair.head, pair.last, current)) = len
+                    len
+                }
+            ).sum
+        }
+    }
+
+    private def isValidMovement(kpd: SimpleGrid, start: (Int, Int), directions: List[Char]): Boolean = {
         var current = start
         boundary:
             for d <- directions do {
                 current += Direction.fromArrow(d).incr
-                if grid.getDataPoint(current) == NA then
+                if kpd.getDataPoint(current) == NA then
                     break(false)
             }
             true
     }
 
-    def fromKeyToKey(grid: SimpleGrid, k1: Char, k2: Char): String = {
-        val (fromCol, fromRow) = grid.findFirst(k1)
-        val (toCol, toRow) = grid.findFirst(k2)
+    def fromKeyToKey(kpd: SimpleGrid, k1: Char, k2: Char): String = {
+        val (fromCol, fromRow) = kpd.findFirst(k1)
+        val (toCol, toRow) = kpd.findFirst(k2)
         val (countHor, countVert) = (abs(toCol - fromCol), abs(toRow - fromRow))
         val moveX = if countHor == 0 then 0 else (toCol - fromCol) / countHor
         val moveY = if countVert == 0 then countVert else (toRow - fromRow) / countVert
@@ -95,7 +118,7 @@ object RoboticArmController {
         val (listPriority1, listPriority2) = if Direction.fromIncr(moveX, 0) == W
             then (horizMoves, vertMoves)
             else (vertMoves, horizMoves)
-        if isValidMovement(grid, (fromCol, fromRow), listPriority1) then listPriority1.mkString + ENTER
+        if isValidMovement(kpd, (fromCol, fromRow), listPriority1) then listPriority1.mkString + ENTER
         else listPriority2.mkString + ENTER
     }
 }
