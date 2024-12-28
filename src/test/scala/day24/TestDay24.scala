@@ -48,6 +48,7 @@ class TestDay24 extends AnyFlatSpec {
         val solver = LogicalCircuit(InputReader.read(24, "src/main/resources/input/input"))
         solver.printCircuit()
         println(solver.inspectCircuit)
+        solver.printCircuit()
     }
 
     it should "verify correct sum and carry for each bit" in {

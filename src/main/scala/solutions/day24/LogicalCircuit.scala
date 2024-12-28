@@ -16,14 +16,12 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
     val gates: Map[String, Gate] = inputForCircuit.map( readGate ).map(g => (g.id, g)).toMap
     val outputs: Vector[String] = gates.values.map( _.id ).filter( _.startsWith("z") ).toVector.sorted.reverse
 
-    def calculateCircuitOutput(id: String, input: Map[String, Int], gates: Map[String, Gate]): Int = {
+    def calculateCircuitOutput(id: String, input: Map[String, Int], gates: Map[String, Gate]): Int =
         if id.startsWith("x") || id.startsWith("y") then
             input(id)
-        else {
-            val gate = gates(id)
-            gate.function(calculateCircuitOutput(gate.input1, input, gates), calculateCircuitOutput(gate.input2, input, gates))
-        }
-    }
+        else
+            gates(id).function(calculateCircuitOutput(gates(id).input1, input, gates),
+                calculateCircuitOutput(gates(id).input2, input, gates))
 
     // was used only in the initial analysis of the circuit
     def checkOutputForBit(id: String, gates: Map[String, Gate]): Boolean = {
@@ -88,37 +86,32 @@ class LogicalCircuit(testData: Vector[String] = Vector()) extends PuzzleSolver {
     // carry_out = (x AND y) OR ((x XOR y) AND carry_in)
     def inspectCircuit: Set[String] = {
         val swappedConnections = mutable.Set[String]()
-        var bit = 0
+        var bit = 1
         var input = inputForCircuit
         var circuit = input.map( readGate ).map(g => (g.id, g)).toMap
-        var carryGate = ""
+        val carry0 = identifyGate("x00", "y00", And, circuit)
+        var carryGate = carry0
         while bit < outputs.size - 1 do {
-            breakable {
-                val (x, y, z) = (f"x$bit%02d", f"y$bit%02d", f"z$bit%02d")
-                if bit == 0 then
-                    carryGate = identifyGate("x00", "y00", And, circuit)
-                else {
-                    val (xyXorGate, xyAndGate) = (identifyGate(x, y, Xor, circuit), identifyGate(x, y, And, circuit))
-                    val sumGate = identifyGate(carryGate, xyXorGate, Xor, circuit)
-                    sumGate match
-                        case "" =>
-                            swappedConnections.addAll(Set(xyXorGate, xyAndGate))
-                            input = swapOutput(input, xyXorGate, xyAndGate)
-                            circuit = input.map( readGate ).map(g => (g.id, g)).toMap
-                            bit = 0
-                            break
-                        case id: String if id != z =>
-                            swappedConnections.addAll(Set(z, sumGate))
-                            input = swapOutput(input, sumGate, z)
-                            circuit = input.map( readGate ).map(g => (g.id, g)).toMap
-                            bit = 0
-                            break
-                        case _ => ;
+            val (x, y, z) = (f"x$bit%02d", f"y$bit%02d", f"z$bit%02d")
+            val (xyXorGate, xyAndGate) = (identifyGate(x, y, Xor, circuit), identifyGate(x, y, And, circuit))
+            val sumGate = identifyGate(carryGate, xyXorGate, Xor, circuit)
+            sumGate match
+                case "" =>
+                    swappedConnections.addAll(Set(xyXorGate, xyAndGate))
+                    input = swapOutput(input, xyXorGate, xyAndGate)
+                    circuit = input.map(readGate).map(g => (g.id, g)).toMap
+                    bit = 1
+                    carryGate = carry0
+                case id: String if id != z =>
+                    swappedConnections.addAll(Set(z, sumGate))
+                    input = swapOutput(input, sumGate, z)
+                    circuit = input.map(readGate).map(g => (g.id, g)).toMap
+                    bit = 1
+                    carryGate = carry0
+                case _ => ;
                     val xyAndCarryGate = identifyGate(carryGate, xyXorGate, And, circuit)
                     carryGate = identifyGate(xyAndCarryGate, xyAndGate, Or, circuit)
-                }
-                bit += 1
-            }
+                    bit += 1
         }
         swappedConnections.toSet
     }
